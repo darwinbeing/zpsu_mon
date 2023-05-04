@@ -27,6 +27,7 @@ extern lv_obj_t *ui____initial_actions0;
 
 
 
+LV_FONT_DECLARE( ui_font_DSEG7ClassicBold36);
 
 
 void ui_init(void);

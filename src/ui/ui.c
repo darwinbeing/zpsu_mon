@@ -26,8 +26,6 @@ lv_obj_t *ui____initial_actions0;
     #error "LV_COLOR_16_SWAP should be 1 to match SquareLine Studio's settings"
 #endif
 
-LV_FONT_DECLARE(DSEG7Classic_Bold_36);
-
 ///////////////////// ANIMATIONS ////////////////////
 
 ///////////////////// FUNCTIONS ////////////////////
@@ -39,7 +37,7 @@ ui_Screen1 = lv_obj_create(NULL);
 lv_obj_clear_flag( ui_Screen1, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 lv_obj_set_style_bg_color(ui_Screen1, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_Screen1, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_Screen1, &DSEG7Classic_Bold_36, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_Screen1, &lv_font_montserrat_36, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_LabelCurrent = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelCurrent, LV_SIZE_CONTENT);  /// 1
@@ -50,7 +48,7 @@ lv_obj_set_align( ui_LabelCurrent, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelCurrent,"00.00");
 lv_obj_set_style_text_color(ui_LabelCurrent, lv_color_hex(0xFFFF00), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_LabelCurrent, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LabelCurrent, &DSEG7Classic_Bold_36, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelCurrent, &ui_font_DSEG7ClassicBold36, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_LabelVoltage = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelVoltage, LV_SIZE_CONTENT);  /// 1
@@ -61,7 +59,7 @@ lv_obj_set_align( ui_LabelVoltage, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelVoltage,"00.00");
 lv_obj_set_style_text_color(ui_LabelVoltage, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_LabelVoltage, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LabelVoltage, &DSEG7Classic_Bold_36, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelVoltage, &ui_font_DSEG7ClassicBold36, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_LabelEnergy = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelEnergy, LV_SIZE_CONTENT);  /// 1
@@ -72,7 +70,7 @@ lv_obj_set_align( ui_LabelEnergy, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelEnergy,"00.00");
 lv_obj_set_style_text_color(ui_LabelEnergy, lv_color_hex(0x00FFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_LabelEnergy, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LabelEnergy, &DSEG7Classic_Bold_36, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelEnergy, &ui_font_DSEG7ClassicBold36, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_LabelPower = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelPower, LV_SIZE_CONTENT);  /// 1
@@ -83,7 +81,7 @@ lv_obj_set_align( ui_LabelPower, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelPower,"00.00");
 lv_obj_set_style_text_color(ui_LabelPower, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_LabelPower, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_LabelPower, &DSEG7Classic_Bold_36, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelPower, &ui_font_DSEG7ClassicBold36, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Label6 = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_Label6, LV_SIZE_CONTENT);  /// 1
@@ -110,12 +108,13 @@ lv_obj_set_style_text_font(ui_Label5, &lv_font_montserrat_16, LV_PART_MAIN| LV_S
 ui_Label8 = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_Label8, LV_SIZE_CONTENT);  /// 1
 lv_obj_set_height( ui_Label8, LV_SIZE_CONTENT);   /// 1
-lv_obj_set_x( ui_Label8, 95 );
+lv_obj_set_x( ui_Label8, 102 );
 lv_obj_set_y( ui_Label8, 54 );
 lv_obj_set_align( ui_Label8, LV_ALIGN_CENTER );
-lv_label_set_text(ui_Label8,"kWh");
+lv_label_set_text(ui_Label8,"Wh");
 lv_obj_set_style_text_color(ui_Label8, lv_color_hex(0x00FFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_Label8, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_align(ui_Label8, LV_TEXT_ALIGN_RIGHT, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_Label8, &lv_font_montserrat_16, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_Label7 = lv_label_create(ui_Screen1);
@@ -125,7 +124,7 @@ lv_obj_set_x( ui_Label7, -20 );
 lv_obj_set_y( ui_Label7, 54 );
 lv_obj_set_align( ui_Label7, LV_ALIGN_CENTER );
 lv_label_set_text(ui_Label7,"W");
-lv_obj_set_style_text_color(ui_Label7, lv_color_hex(0xAC0000), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_text_color(ui_Label7, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_text_opa(ui_Label7, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_Label7, &lv_font_montserrat_16, LV_PART_MAIN| LV_STATE_DEFAULT);
 
