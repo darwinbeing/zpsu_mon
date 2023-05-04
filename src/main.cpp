@@ -34,6 +34,7 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 #define GPIO_PORT DT_NODELABEL(gpio0)
 #define GPIO_BL_EN	20
 static int set_backlight(uint8_t brightness);
+static struct k_event ui_event;
 
 class PowerSupply {
  public:
@@ -342,6 +343,9 @@ static void psu_mon(void *p1, void *p2, void *p3)
 
 		float power = volts * amps;
 		energy += power * elapsed_time / 1000.0 / 3600;
+
+    k_event_set(&ui_event, 0x01);
+
 		k_sleep(K_MSEC(500));
 	}
 }
@@ -418,6 +422,8 @@ int main(void)
 	}
 #endif
 
+  k_event_init(&ui_event);
+
 	// pwm_led_init();
 	bl_init();
 
@@ -431,32 +437,31 @@ int main(void)
 	lv_task_handler();
 	display_blanking_off(display_dev);
 
+	uint32_t events;
 	char buf[32];
 	while (1) {
-		// sprintf(buf, "%.2f", volts);
-		format_val(volts, buf);
-		lv_label_set_text(ui_LabelVoltage, buf);
+    events = k_event_wait(&ui_event, 0x01, false, K_MSEC(100));
+    if (events) {
+      format_val(volts, buf);
+      lv_label_set_text(ui_LabelVoltage, buf);
 
-		// sprintf(buf, "%.2f", amps);
-		format_val(amps, buf);
-		lv_label_set_text(ui_LabelCurrent, buf);
+      format_val(amps, buf);
+      lv_label_set_text(ui_LabelCurrent, buf);
 
-		// sprintf(buf, "%.2f", watts);
-		format_val(watts, buf);
-		lv_label_set_text(ui_LabelPower, buf);
+      format_val(watts, buf);
+      lv_label_set_text(ui_LabelPower, buf);
 
-		// sprintf(buf, "%.2f", energy);
-		if(energy >= 1000) {
-			format_val(energy/1000, buf);
-			lv_label_set_text(ui_LabelEnergy, buf);
-			lv_label_set_text(ui_Label8, "kWh");
-		} else {
-			format_val(energy, buf);
-			lv_label_set_text(ui_LabelEnergy, buf);
-			lv_label_set_text(ui_Label8, "Wh");
-		}
-		// printf("hello world!\n");
-		lv_task_handler();
-		k_sleep(K_MSEC(500));
+      if(energy >= 1000) {
+        format_val(energy/1000, buf);
+        lv_label_set_text(ui_LabelEnergy, buf);
+        lv_label_set_text(ui_Label8, "kWh");
+      } else {
+        format_val(energy, buf);
+        lv_label_set_text(ui_LabelEnergy, buf);
+        lv_label_set_text(ui_Label8, "Wh");
+      }
+      lv_task_handler();
+    }
 	}
+
 }

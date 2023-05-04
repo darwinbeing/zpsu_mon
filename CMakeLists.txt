@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.20.0)
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(hp_psu-mon)
+project(zpsu-mon)
 
 add_definitions(-DLV_LVGL_H_INCLUDE_SIMPLE)
 
