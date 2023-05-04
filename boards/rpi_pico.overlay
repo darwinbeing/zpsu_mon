@@ -1,0 +1,124 @@
+/*
+ * Copyright (c) 2019 Creative Product Design
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+#include <zephyr/dt-bindings/pinctrl/rpi-pico-rp2040-pinctrl.h>
+/ {
+    chosen {
+	   zephyr,display = &dummy_dc;
+	   zephyr,console = &usb_cdc;
+	   zephyr,shell-uart = &usb_cdc;
+	   zephyr,display = &st7789v;
+	};
+
+    buttons {
+        compatible = "gpio-keys";
+        button0: button_A {
+            gpios = <&gpio0 12 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button A";
+        };
+        button1: button_B {
+            gpios = <&gpio0 13 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button B";
+        };
+        button2: button_X {
+            gpios = <&gpio0 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button X";
+        };
+        button3: button_Y {
+            gpios = <&gpio0 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button Y";
+        };
+    };
+
+	/* pwm_leds { */
+	/* 	compatible = "pwm-leds"; */
+	/* 	pwm_led1: pwm_led_1 { */
+	/* 		pwms = <&pwm 4 PWM_MSEC(1) PWM_POLARITY_NORMAL>; */ /* Pico Display Pack backlight */
+	/* 	}; */
+        /* }; */
+
+    aliases {
+        sw0 = &button0;
+        sw1 = &button1;
+        sw2 = &button2;
+        sw3 = &button3;
+        /* pwm-led1 = &pwm_led1; */
+
+        sw-top-right = &button2;
+        sw-top-left = &button0;
+        sw-bottom-right = &button3;
+        sw-bottom-left = &button1;
+    };
+};
+
+&pinctrl {
+	pwm_ch2a_default: pwm_ch2a_default {
+		group1 {
+			pinmux = <PWM_2A_P20>;
+		};
+	};
+};
+
+&spi0 {
+	status = "okay";
+	cs-gpios = <&gpio0 17 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&spi0_default>;
+	pinctrl-names = "default";
+
+	/* Sitronix ST7789V LCD */
+	st7789v: st7789v@0 {
+		compatible = "sitronix,st7789v";
+		reg = <0>;
+		spi-max-frequency = <20000000>; /* 20MHz */
+		cmd-data-gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;	/* DET */
+		/* reset-gpios = <&gpio0 25 GPIO_ACTIVE_LOW>; */	/* RESX reset */
+		width = <240>;
+		height = <135>;
+		x-offset = <40>;
+		y-offset = <53>;
+		vcom = <0x19>;
+		gctrl = <0x35>;
+		vrhs = <0x12>;
+		vdvs = <0x20>;
+		mdac = <0x70>;
+		gamma = <0x03>;
+		colmod = <0x05>;
+		lcm = <0x2c>;
+		porch-param = [0c 0c 00 33 33];
+		cmd2en-param = [5a 69 02 01];
+		pwctrl1-param = [a4 a1];
+		pvgam-param = [D0 04 0D 11 13 2B 3F 54 4C 18 0D 0B 1F 23];
+		nvgam-param = [D0 04 0C 11 13 2C 3F 44 51 2F 1F 1F 20 23];
+		ram-param = [00 F0];
+		rgb-param = [CD 08 14];
+
+	};
+};
+
+&zephyr_udc0 {
+	usb_cdc: usb_cdc_0 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};
+
+&pwm_led0 {
+	status = "okay";
+};
+
+/* &pwm_led1 { */
+/* 	status = "okay"; */
+/* }; */
+
+&pwm {
+	/* pinctrl-0 = <&pwm_ch2a_default>; */
+	pinctrl-names = "default";
+	status = "okay";
+	divider-frac-4 = <15>;
+	divider-int-4 = <255>;
+
+	/* divider-frac-2 = <15>; */
+	/* divider-int-2 = <255>; */
+
+};
