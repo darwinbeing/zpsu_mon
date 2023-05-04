@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2018 Jan Van Winkel <jan.van_winkel@dxplore.eu>
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include <zephyr/device.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/display.h>
@@ -23,21 +17,23 @@
 LOG_MODULE_REGISTER(app);
 
 static const struct pwm_dt_spec pwm_led0 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
-// static const struct pwm_dt_spec pwm_led1 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
+static const struct pwm_dt_spec pwm_led1 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
 
 
 static uint32_t count;
+static uint8_t brightness = 0;
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   1000
 
-/* The devicetree node identifier for the "led0" alias. */
+// The devicetree node identifier for the "led0" alias.
 #define LED0_NODE DT_ALIAS(led0)
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 
 #define GPIO_PORT DT_NODELABEL(gpio0)
 #define GPIO_BL_EN  20
+static int set_backlight(uint8_t brightness);
 
 class PowerSupply {
  public:
@@ -64,7 +60,7 @@ class PowerSupply {
     this->maxReg_ = new uint16_t[this->numReg_];
     memset(this->maxReg_, 0, this->numReg_ * sizeof(uint16_t));
 
-    k_mutex_init(&mutex_);
+    // k_mutex_init(&mutex_);
 
   }
   int deviceIsReady() {
@@ -83,19 +79,18 @@ class PowerSupply {
     // free(lastReg_);
     // free(minReg_);
     // free(maxReg_);
-
   }
 
   int readEEPROM() {
     uint8_t data[256];
 
-    k_mutex_lock(&this->mutex_, K_FOREVER);
+    // k_mutex_lock(&this->mutex_, K_FOREVER);
     if (i2c_burst_read(this->i2cdev_, this->EEaddress_, 0, data, 256)) {
       printf("Failed to read EEPROM\n");
-      k_mutex_unlock(&this->mutex_);
+      // k_mutex_unlock(&this->mutex_);
       return -1;
     }
-    k_mutex_unlock(&this->mutex_);
+    // k_mutex_unlock(&this->mutex_);
     printf("%02x", data[0]);
     for (int i = 1; i < 256; i++) {
       printf(" %02x", data[i]);
@@ -118,13 +113,13 @@ class PowerSupply {
       }
     };
 
-    k_mutex_lock(&this->mutex_, K_FOREVER);
+    // k_mutex_lock(&this->mutex_, K_FOREVER);
     if (i2c_transfer(this->i2cdev_, &msgs[0], 2, address)) {
       printf("Failed to read variable\n");
-      k_mutex_unlock(&this->mutex_);
+      // k_mutex_unlock(&this->mutex_);
       return -1;
     }
-    k_mutex_unlock(&this->mutex_);
+    // k_mutex_unlock(&this->mutex_);
 
     return 0;
   }
@@ -133,12 +128,12 @@ class PowerSupply {
     uint8_t reg = data[0];
     uint8_t *buf = &data[1];
 
-    k_mutex_lock(&this->mutex_, K_FOREVER);
+    // k_mutex_lock(&this->mutex_, K_FOREVER);
     if (i2c_burst_write(this->i2cdev_, address, reg, (uint8_t *)buf, len - 1)) {
-      k_mutex_unlock(&this->mutex_);
+      // k_mutex_unlock(&this->mutex_);
       return -1;
     }
-    k_mutex_unlock(&this->mutex_);
+    // k_mutex_unlock(&this->mutex_);
 
     return 0;
   }
@@ -196,14 +191,14 @@ class PowerSupply {
   uint16_t* lastReg_;
   uint16_t* minReg_;
   uint16_t* maxReg_;
-	struct k_mutex mutex_;
+	// struct k_mutex mutex_;
 };
 
-PowerSupply ps=PowerSupply(0, 7);
+static PowerSupply ps=PowerSupply(0, 7);
 
 #ifdef CONFIG_GPIO
 static struct gpio_dt_spec button_gpio = GPIO_DT_SPEC_GET_OR(
-		DT_ALIAS(sw0), gpios, {0});
+		DT_ALIAS(sw2), gpios, {0});
 static struct gpio_callback button_callback;
 
 static void button_isr_callback(const struct device *port,
@@ -214,33 +209,52 @@ static void button_isr_callback(const struct device *port,
 	ARG_UNUSED(cb);
 	ARG_UNUSED(pins);
 	count = 0;
+  brightness += 2;
+  set_backlight(brightness);
 }
 #endif
 
-// int bl_init()
-// {
-// 	uint32_t period = PWM_MSEC(500);
-// 	uint8_t dir = 0U;
-// 	int ret;
+static int bl_init()
+{
+	uint32_t period = PWM_USEC(10);
+	int ret;
 
-//   printk("bl_init\n");
-//   printk("PWM-based blinky\n");
+  printk("bl_init\n");
+  printk("PWM-based backlight\n");
 
-// 	if (!device_is_ready(pwm_led1.dev)) {
-// 		printk("Error: PWM device %s is not ready\n",
-// 		       pwm_led1.dev->name);
-// 		return -1;
-// 	}
+	if (!device_is_ready(pwm_led1.dev)) {
+		printk("Error: PWM device %s is not ready\n",
+		       pwm_led1.dev->name);
+		return -1;
+	}
 
-//   ret = pwm_set_dt(&pwm_led1, period, period / 2);
-//   if (ret) {
-//     printk("Error %d: failed to set pulse width\n", ret);
-//     return -3;
-// 	}
+  ret = pwm_set_dt(&pwm_led1, period, period / 2);
+  if (ret) {
+    printk("Error %d: failed to set pulse width\n", ret);
+    return -3;
+	}
 
-//   return 0;
-// }
+  return 0;
+}
 
+static int set_backlight(uint8_t brightness) {
+	uint32_t period = PWM_USEC(100);
+	int ret;
+
+	if (!device_is_ready(pwm_led1.dev)) {
+		printk("Error: PWM device %s is not ready\n",
+		       pwm_led1.dev->name);
+		return -1;
+	}
+
+  ret = pwm_set_dt(&pwm_led1, period, period * brightness / 255);
+  if (ret) {
+    printk("Error %d: failed to set pulse width\n", ret);
+    return -3;
+	}
+
+  return 0;
+}
 
 /* size of stack area used by each thread */
 #define STACKSIZE 1024
@@ -275,10 +289,10 @@ static void led_entry(void *p1, void *p2, void *p3)
 	}
 }
 
-float volts = 0;
-float amps = 0;
-float watts = 0;
-float energy = 0;
+static float volts = 0;
+static float amps = 0;
+static float watts = 0;
+static float energy = 0;
 
 static void psu_mon(void *p1, void *p2, void *p3)
 {
@@ -318,7 +332,7 @@ static void psu_mon(void *p1, void *p2, void *p3)
 
 #define max(a,b) ((a) >= (b) ? (a) : (b))
 
-int format_val(float num, char *buf) {
+static int format_val(float num, char *buf) {
   if(num <= 0) {
     sprintf(buf, "%s", "00.00");
   } else if(0 < num && num < 1) {
@@ -330,9 +344,9 @@ int format_val(float num, char *buf) {
   return 0;
 }
 
-static void pwm_led(void *p1, void *p2, void *p3)
+static int pwm_led_init()
 {
-	uint32_t period = PWM_SEC(1);
+	uint32_t period = PWM_SEC(500);
 	int ret;
 
 	printk("PWM-based blinky\n");
@@ -340,14 +354,15 @@ static void pwm_led(void *p1, void *p2, void *p3)
 	if (!device_is_ready(pwm_led0.dev)) {
 		printk("Error: PWM device %s is not ready\n",
 		       pwm_led0.dev->name);
-		return;
+		return -1;
 	}
 
   ret = pwm_set_dt(&pwm_led0, period, period / 2U);
   if (ret) {
     printk("Error %d: failed to set pulse width\n", ret);
-    return;
+    return -2;
   }
+  return 0;
 }
 
 int main(void)
@@ -387,15 +402,14 @@ int main(void)
 	}
 #endif
 
-  // bl_init();
+  // pwm_led_init();
+  bl_init();
 
 	k_thread_create(&led_thread, led_task_stack, STACKSIZE, led_entry, NULL, NULL,
                   NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 	k_thread_create(&psu_mon_thread, psu_mon_stack, STACKSIZE, psu_mon, NULL, NULL,
                   NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 
-	// k_thread_create(&pwm_led_thread, pwm_led_stack, STACKSIZE, pwm_led, NULL, NULL,
-  //                 NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 
   ui_init();
 	lv_task_handler();
