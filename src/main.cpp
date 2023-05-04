@@ -60,7 +60,7 @@ class PowerSupply {
     this->maxReg_ = new uint16_t[this->numReg_];
     memset(this->maxReg_, 0, this->numReg_ * sizeof(uint16_t));
 
-    // k_mutex_init(&mutex_);
+    k_mutex_init(&mutex_);
 
   }
   int deviceIsReady() {
@@ -85,12 +85,18 @@ class PowerSupply {
     uint8_t data[256];
 
     // k_mutex_lock(&this->mutex_, K_FOREVER);
-    if (i2c_burst_read(this->i2cdev_, this->EEaddress_, 0, data, 256)) {
-      printf("Failed to read EEPROM\n");
-      // k_mutex_unlock(&this->mutex_);
+    if(k_mutex_lock(&this->mutex_, K_MSEC(100))) {
+      printf("i2c mutex lock failed\n");
       return -1;
     }
-    // k_mutex_unlock(&this->mutex_);
+
+    if (i2c_burst_read(this->i2cdev_, this->EEaddress_, 0, data, 256)) {
+      printf("Failed to read EEPROM\n");
+      k_mutex_unlock(&this->mutex_);
+      return -2;
+    }
+
+    k_mutex_unlock(&this->mutex_);
     printf("%02x", data[0]);
     for (int i = 1; i < 256; i++) {
       printf(" %02x", data[i]);
@@ -114,12 +120,17 @@ class PowerSupply {
     };
 
     // k_mutex_lock(&this->mutex_, K_FOREVER);
-    if (i2c_transfer(this->i2cdev_, &msgs[0], 2, address)) {
-      printf("Failed to read variable\n");
-      // k_mutex_unlock(&this->mutex_);
+    if(k_mutex_lock(&this->mutex_, K_MSEC(100))) {
+      printf("i2c mutex lock failed\n");
       return -1;
     }
-    // k_mutex_unlock(&this->mutex_);
+
+    if (i2c_transfer(this->i2cdev_, &msgs[0], 2, address)) {
+      printf("Failed to read variable\n");
+      k_mutex_unlock(&this->mutex_);
+      return -1;
+    }
+    k_mutex_unlock(&this->mutex_);
 
     return 0;
   }
@@ -129,11 +140,16 @@ class PowerSupply {
     uint8_t *buf = &data[1];
 
     // k_mutex_lock(&this->mutex_, K_FOREVER);
-    if (i2c_burst_write(this->i2cdev_, address, reg, (uint8_t *)buf, len - 1)) {
-      // k_mutex_unlock(&this->mutex_);
+    if(k_mutex_lock(&this->mutex_, K_MSEC(100))) {
+      printf("i2c mutex lock failed\n");
       return -1;
     }
-    // k_mutex_unlock(&this->mutex_);
+
+    if (i2c_burst_write(this->i2cdev_, address, reg, (uint8_t *)buf, len - 1)) {
+      k_mutex_unlock(&this->mutex_);
+      return -1;
+    }
+    k_mutex_unlock(&this->mutex_);
 
     return 0;
   }
@@ -191,7 +207,7 @@ class PowerSupply {
   uint16_t* lastReg_;
   uint16_t* minReg_;
   uint16_t* maxReg_;
-	// struct k_mutex mutex_;
+	struct k_mutex mutex_;
 };
 
 static PowerSupply ps=PowerSupply(0, 7);
