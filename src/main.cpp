@@ -12,6 +12,8 @@
 #include <math.h>
 #include "ui.h"
 
+#include "button_handler.h"
+
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(app);
@@ -22,6 +24,7 @@ static const struct pwm_dt_spec pwm_led1 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
 
 static uint32_t count;
 static uint8_t brightness = 0;
+static uint32_t fanRPM = 3200;
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS		1000
@@ -30,8 +33,8 @@ static uint8_t brightness = 0;
 #define LED0_NODE DT_ALIAS(led0)
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
+// #define GPIO_PORT DT_NODELABEL(gpio0)
 
-#define GPIO_PORT DT_NODELABEL(gpio0)
 #define GPIO_BL_EN	20
 static int set_backlight(uint8_t brightness);
 static struct k_event ui_event;
@@ -119,18 +122,17 @@ class PowerSupply {
 				.flags = I2C_MSG_READ | I2C_MSG_RESTART | I2C_MSG_STOP,
 			}
 		};
-
 		// k_mutex_lock(&this->mutex_, K_FOREVER);
 		if(k_mutex_lock(&this->mutex_, K_MSEC(100))) {
 			printf("i2c mutex lock failed\n");
 			return -1;
 		}
-
 		if (i2c_transfer(this->i2cdev_, &msgs[0], 2, address)) {
 			printf("Failed to read variable\n");
 			k_mutex_unlock(&this->mutex_);
 			return -1;
 		}
+
 		k_mutex_unlock(&this->mutex_);
 
 		return 0;
@@ -213,23 +215,30 @@ class PowerSupply {
 
 static PowerSupply ps=PowerSupply(0, 7);
 
-#ifdef CONFIG_GPIO
-static struct gpio_dt_spec button_gpio = GPIO_DT_SPEC_GET_OR(
-		DT_ALIAS(sw2), gpios, {0});
-static struct gpio_callback button_callback;
-
-static void button_isr_callback(const struct device *port,
-																struct gpio_callback *cb,
-																uint32_t pins)
-{
-	ARG_UNUSED(port);
-	ARG_UNUSED(cb);
-	ARG_UNUSED(pins);
-	count = 0;
-	brightness += 2;
-	set_backlight(brightness);
+void button_process(int pin) {
+  switch(pin) {
+    // case 12:
+    //   fanRPM += 1000;
+    //   ps.forceFanRPM(fanRPM);
+    //   break;
+    // case 13:
+    //   fanRPM -= 1000;
+    //   ps.forceFanRPM(fanRPM);
+    //   break;
+    case 14:
+      brightness += 2;
+      set_backlight(brightness);
+      break;
+    case 15:
+      brightness -= 2;
+      set_backlight(brightness);
+      break;
+    default:
+      break;
+  }
 }
-#endif
+
+
 
 static int bl_init()
 {
@@ -336,7 +345,6 @@ static void psu_mon(void *p1, void *p2, void *p3)
 		if(!ret) {
 			watts = val;
 		}
-
 		uint32_t end_time_ms = k_uptime_get();
 		uint32_t elapsed_time = end_time_ms - start_time_ms;
 		start_time_ms = end_time_ms;
@@ -435,42 +443,18 @@ int main(void)
 		return -1;
 	}
 
-#ifdef CONFIG_GPIO
-	if (device_is_ready(button_gpio.port)) {
-		err = gpio_pin_configure_dt(&button_gpio, GPIO_INPUT);
-		if (err) {
-			LOG_ERR("failed to configure button gpio: %d", err);
-			return -1;
-		}
-
-		gpio_init_callback(&button_callback, button_isr_callback,
-											 BIT(button_gpio.pin));
-
-		err = gpio_add_callback(button_gpio.port, &button_callback);
-		if (err) {
-			LOG_ERR("failed to add button callback: %d", err);
-			return -1;
-		}
-
-		err = gpio_pin_interrupt_configure_dt(&button_gpio,
-																					GPIO_INT_EDGE_TO_ACTIVE);
-		if (err) {
-			LOG_ERR("failed to enable button callback: %d", err);
-			return -1;
-		}
-	}
-#endif
-
   k_event_init(&ui_event);
 
   pwm_rgb_led_init();
 	// pwm_led_init();
+  button_handler_init();
+
 	bl_init();
 
 	k_thread_create(&led_thread, led_task_stack, STACKSIZE, led_entry, NULL, NULL,
 									NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
 	k_thread_create(&psu_mon_thread, psu_mon_stack, STACKSIZE, psu_mon, NULL, NULL,
-									NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
+									NULL, K_PRIO_PREEMPT(6), 0, K_NO_WAIT);
 
 
 	ui_init();
