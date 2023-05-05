@@ -267,7 +267,7 @@ static int set_backlight(uint8_t brightness) {
 	ret = pwm_set_dt(&pwm_led1, period, period * brightness / 255);
 	if (ret) {
 		printk("Error %d: failed to set pulse width\n", ret);
-		return -3;
+		return -2;
 	}
 
 	return 0;
@@ -364,6 +364,45 @@ static int format_val(float num, char *buf) {
 	return 0;
 }
 
+static const struct pwm_dt_spec red_pwm_led = PWM_DT_SPEC_GET(DT_ALIAS(red_pwm_led));
+static const struct pwm_dt_spec green_pwm_led = PWM_DT_SPEC_GET(DT_ALIAS(green_pwm_led));
+static const struct pwm_dt_spec blue_pwm_led = PWM_DT_SPEC_GET(DT_ALIAS(blue_pwm_led));
+
+#define STEP_SIZE PWM_USEC(2000)
+
+int pwm_rgb_led_init(void)
+{
+	uint32_t pulse_red = PWM_MSEC(20), pulse_green = PWM_MSEC(20), pulse_blue = PWM_MSEC(20); /* pulse widths */
+	int ret;
+
+	printk("PWM-based RGB LED control\n");
+
+	if (!device_is_ready(red_pwm_led.dev) ||
+	    !device_is_ready(green_pwm_led.dev) ||
+	    !device_is_ready(blue_pwm_led.dev)) {
+		printk("Error: one or more PWM devices not ready\n");
+		return 0;
+	}
+
+  ret = pwm_set_pulse_dt(&red_pwm_led, pulse_red);
+  if (ret != 0) {
+    printk("Error %d: red write failed\n", ret);
+    return 0;
+  }
+
+  ret = pwm_set_pulse_dt(&green_pwm_led, pulse_green);
+  if (ret != 0) {
+    printk("Error %d: green write failed\n", ret);
+    return 0;
+  }
+  ret = pwm_set_pulse_dt(&blue_pwm_led, pulse_blue);
+  if (ret != 0) {
+    printk("Error %d: blue write failed\n", ret);
+    return 0;
+  }
+	return 0;
+}
+
 static int pwm_led_init()
 {
 	uint32_t period = PWM_SEC(500);
@@ -424,6 +463,7 @@ int main(void)
 
   k_event_init(&ui_event);
 
+  pwm_rgb_led_init();
 	// pwm_led_init();
 	bl_init();
 
