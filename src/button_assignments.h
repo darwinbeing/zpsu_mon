@@ -19,10 +19,10 @@
 /** @brief List of buttons and associated metadata
  */
 enum button_pin_names {
-	BUTTON_VOLUME_DOWN = DT_GPIO_PIN(DT_ALIAS(sw0), gpios),
-	BUTTON_VOLUME_UP = DT_GPIO_PIN(DT_ALIAS(sw1), gpios),
-	BUTTON_PLAY_PAUSE = DT_GPIO_PIN(DT_ALIAS(sw2), gpios),
-	BUTTON_4 = DT_GPIO_PIN(DT_ALIAS(sw3), gpios),
+	BUTTON_A = DT_GPIO_PIN(DT_ALIAS(sw0), gpios),
+	BUTTON_B = DT_GPIO_PIN(DT_ALIAS(sw1), gpios),
+	BUTTON_X = DT_GPIO_PIN(DT_ALIAS(sw2), gpios),
+	BUTTON_Y = DT_GPIO_PIN(DT_ALIAS(sw3), gpios),
 };
 
 #endif /* _BUTTON_ASSIGNMENTS_H_ */

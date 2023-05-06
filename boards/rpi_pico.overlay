@@ -6,7 +6,6 @@
 #include <zephyr/dt-bindings/pinctrl/rpi-pico-rp2040-pinctrl.h>
 / {
     chosen {
-	   zephyr,display = &dummy_dc;
 	   zephyr,console = &usb_cdc;
 	   zephyr,shell-uart = &usb_cdc;
 	   zephyr,display = &st7789v;

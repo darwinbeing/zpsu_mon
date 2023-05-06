@@ -4,6 +4,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/pwm.h>
+#include <zephyr/zbus/zbus.h>
 #include <lvgl.h>
 #include <stdio.h>
 #include <string.h>
@@ -13,6 +14,7 @@
 #include "ui.h"
 
 #include "button_handler.h"
+#include "button_assignments.h"
 
 #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
 #include <zephyr/logging/log.h>
@@ -38,6 +40,18 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 #define GPIO_BL_EN	20
 static int set_backlight(uint8_t brightness);
 static struct k_event ui_event;
+
+ZBUS_CHAN_DECLARE(button_chan);
+ZBUS_OBS_DECLARE(button_sub);
+
+#define CONFIG_BUTTON_MSG_SUB_THREAD_PRIO 5
+#define CONFIG_BUTTON_MSG_SUB_QUEUE_SIZE 4
+#define CONFIG_BUTTON_MSG_SUB_STACK_SIZE 1024
+ZBUS_SUBSCRIBER_DEFINE(button_sub, CONFIG_BUTTON_MSG_SUB_QUEUE_SIZE);
+static struct k_thread button_msg_sub_thread_data;
+static k_tid_t button_msg_sub_thread_id;
+
+K_THREAD_STACK_DEFINE(button_msg_sub_thread_stack, CONFIG_BUTTON_MSG_SUB_STACK_SIZE);
 
 class PowerSupply {
  public:
@@ -215,31 +229,6 @@ class PowerSupply {
 
 static PowerSupply ps=PowerSupply(0, 7);
 
-void button_process(int pin) {
-  switch(pin) {
-    // case 12:
-    //   fanRPM += 1000;
-    //   ps.forceFanRPM(fanRPM);
-    //   break;
-    // case 13:
-    //   fanRPM -= 1000;
-    //   ps.forceFanRPM(fanRPM);
-    //   break;
-    case 14:
-      brightness += 2;
-      set_backlight(brightness);
-      break;
-    case 15:
-      brightness -= 2;
-      set_backlight(brightness);
-      break;
-    default:
-      break;
-  }
-}
-
-
-
 static int bl_init()
 {
 	uint32_t period = PWM_USEC(10);
@@ -330,6 +319,7 @@ static void psu_mon(void *p1, void *p2, void *p3)
 	while(1) {
 		int val;
 		int ret;
+
 		ret=ps.readDPS1200Register(7, &val);
 		if(!ret) {
 			volts = val;
@@ -353,7 +343,6 @@ static void psu_mon(void *p1, void *p2, void *p3)
 		energy += power * elapsed_time / 1000.0 / 3600;
 
     k_event_set(&ui_event, 0x01);
-
 		k_sleep(K_MSEC(500));
 	}
 }
@@ -432,9 +421,50 @@ static int pwm_led_init()
 	return 0;
 }
 
+/* Handle button activity */
+static void button_msg_sub_thread(void)
+{
+	int ret;
+	const struct zbus_channel *chan;
+
+	while (1) {
+		ret = zbus_sub_wait(&button_sub, &chan, K_FOREVER);
+
+		struct button_msg msg;
+
+		ret = zbus_chan_read(chan, &msg, K_MSEC(100));
+
+		LOG_DBG("Got btn evt from queue - id = %d, action = %d", msg.button_pin,
+			msg.button_action);
+
+		if (msg.button_action != BUTTON_PRESS) {
+			LOG_WRN("Unhandled button action");
+			return;
+		}
+
+		switch (msg.button_pin) {
+		case BUTTON_A:
+			break;
+		case BUTTON_B:
+			break;
+		case BUTTON_X:
+      brightness += 2;
+      set_backlight(brightness);
+			break;
+		case BUTTON_Y:
+      brightness -= 2;
+      set_backlight(brightness);
+			break;
+		default:
+			printf("Unexpected/unhandled button id: %d\n", msg.button_pin);
+		}
+	}
+}
+
+
 int main(void)
 {
-	int err;
+	int ret;
 	const struct device *display_dev;
 
 	display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
@@ -444,22 +474,28 @@ int main(void)
 	}
 
   k_event_init(&ui_event);
-
   pwm_rgb_led_init();
 	// pwm_led_init();
-  button_handler_init();
-
 	bl_init();
-
-	k_thread_create(&led_thread, led_task_stack, STACKSIZE, led_entry, NULL, NULL,
-									NULL, K_PRIO_COOP(7), 0, K_NO_WAIT);
-	k_thread_create(&psu_mon_thread, psu_mon_stack, STACKSIZE, psu_mon, NULL, NULL,
-									NULL, K_PRIO_PREEMPT(6), 0, K_NO_WAIT);
-
-
 	ui_init();
 	lv_task_handler();
 	display_blanking_off(display_dev);
+
+	k_thread_create(&led_thread, led_task_stack, STACKSIZE, led_entry, NULL, NULL,
+									NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
+	// k_thread_create(&psu_mon_thread, psu_mon_stack, STACKSIZE, psu_mon, NULL, NULL,
+	// 								NULL, K_PRIO_PREEMPT(6), 0, K_NO_WAIT);
+	k_thread_create(&psu_mon_thread, psu_mon_stack, STACKSIZE, psu_mon, NULL, NULL,
+									NULL, K_PRIO_PREEMPT(0), 0, K_MSEC(1));
+
+  ret = zbus_chan_add_obs(&button_chan, &button_sub, K_MSEC(200));
+  button_handler_init();
+	button_msg_sub_thread_id =
+		k_thread_create(&button_msg_sub_thread_data, button_msg_sub_thread_stack,
+				CONFIG_BUTTON_MSG_SUB_STACK_SIZE,
+				(k_thread_entry_t)button_msg_sub_thread, NULL, NULL, NULL,
+				K_PRIO_PREEMPT(CONFIG_BUTTON_MSG_SUB_THREAD_PRIO), 0, K_NO_WAIT);
+	ret = k_thread_name_set(button_msg_sub_thread_id, "BUTTON_MSG_SUB");
 
 	uint32_t events;
 	char buf[32];
@@ -485,6 +521,7 @@ int main(void)
         lv_label_set_text(ui_Label8, "Wh");
       }
       lv_task_handler();
+      k_sleep(K_MSEC(100));
     }
 	}
 

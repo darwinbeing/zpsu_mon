@@ -12,7 +12,7 @@
 
 #define CONFIG_MODULE_BUTTON_HANDLER_LOG_LEVEL 3
 #define CONFIG_BUTTON_PUBLISH_STACK_SIZE 1024
-#define CONFIG_BUTTON_PUBLISH_THREAD_PRIO 7
+#define CONFIG_BUTTON_PUBLISH_THREAD_PRIO 5
 #define CONFIG_BUTTON_DEBOUNCE_MS   10
 
 enum button_action {
@@ -52,8 +52,6 @@ int button_handler_init(void);
  * @return 0 if success, an error code otherwise.
  */
 int button_pressed(gpio_pin_t button_pin, bool *button_pressed);
-
-void button_process(int pin);
 
 #ifdef __cplusplus
 } /*extern "C"*/

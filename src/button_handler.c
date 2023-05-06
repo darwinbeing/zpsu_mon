@@ -15,14 +15,12 @@
 #include <stdio.h>
 #include <ctype.h>
 
-/* #include "macros_common.h" */
-/* #include "nrf5340_audio_common.h" */
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(button_handler, CONFIG_MODULE_BUTTON_HANDLER_LOG_LEVEL);
 
 /* How many buttons does the module support. Increase at memory cost */
-#define BUTTONS_MAX 5
+#define BUTTONS_MAX 4
 #define BASE_10 10
 
 /* Only allow one button msg at a time, as a mean of debounce */
@@ -33,23 +31,23 @@ static struct gpio_callback btn_callback[BUTTONS_MAX];
 
 const static struct btn_config btn_cfg[] = {
 	{
-		.btn_name = STRINGIFY(BUTTON_VOLUME_DOWN),
-		.btn_pin = BUTTON_VOLUME_DOWN,
+		.btn_name = STRINGIFY(BUTTON_A),
+		.btn_pin = BUTTON_A,
 		.btn_cfg_mask = DT_GPIO_FLAGS(DT_ALIAS(sw0), gpios),
 	},
 	{
-		.btn_name = STRINGIFY(BUTTON_VOLUME_UP),
-		.btn_pin = BUTTON_VOLUME_UP,
+		.btn_name = STRINGIFY(BUTTON_B),
+		.btn_pin = BUTTON_B,
 		.btn_cfg_mask = DT_GPIO_FLAGS(DT_ALIAS(sw1), gpios),
 	},
 	{
-		.btn_name = STRINGIFY(BUTTON_PLAY_PAUSE),
-		.btn_pin = BUTTON_PLAY_PAUSE,
+		.btn_name = STRINGIFY(BUTTON_X),
+		.btn_pin = BUTTON_X,
 		.btn_cfg_mask = DT_GPIO_FLAGS(DT_ALIAS(sw2), gpios),
 	},
 	{
-		.btn_name = STRINGIFY(BUTTON_4),
-		.btn_pin = BUTTON_4,
+		.btn_name = STRINGIFY(BUTTON_Y),
+		.btn_pin = BUTTON_Y,
 		.btn_cfg_mask = DT_GPIO_FLAGS(DT_ALIAS(sw3), gpios),
 	}
 };
@@ -115,16 +113,6 @@ static int pin_msk_to_pin(uint32_t pin_msk, uint32_t *pin_out)
 ZBUS_CHAN_DEFINE(button_chan, struct button_msg, NULL, NULL, ZBUS_OBSERVERS_EMPTY,
 		 ZBUS_MSG_INIT(0));
 
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-void button_process(int pin);
-#ifdef __cplusplus
-}
-#endif
-
 static void button_publish_thread(void)
 {
 	int ret;
@@ -132,12 +120,10 @@ static void button_publish_thread(void)
 
 	while (1) {
 		k_msgq_get(&button_queue, &msg, K_FOREVER);
-                button_process(msg.button_pin);
-
-		/* ret = zbus_chan_pub(&button_chan, &msg, K_NO_WAIT); */
-		/* if (ret) { */
-		/* 	LOG_ERR("Failed to publish button msg, ret: %d", ret); */
-		/* } */
+		ret = zbus_chan_pub(&button_chan, &msg, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("Failed to publish button msg, ret: %d", ret);
+		}
 	}
 }
 
@@ -253,44 +239,6 @@ static int cmd_print_all_btns(const struct shell *shell, size_t argc, char **arg
 	for (uint8_t i = 0; i < ARRAY_SIZE(btn_cfg); i++) {
 		shell_print(shell, "Id %d: pin: %d %s", i, btn_cfg[i].btn_pin, btn_cfg[i].btn_name);
 	}
-
-	return 0;
-}
-
-static int cmd_push_btn(const struct shell *shell, size_t argc, char **argv)
-{
-	int ret;
-	uint8_t btn_idx;
-	struct button_msg msg;
-
-	/* First argument is function, second is button idx */
-	if (argc != 2) {
-		shell_error(shell, "Wrong number of arguments provided");
-		return -EINVAL;
-	}
-
-	if (!isdigit((int)argv[1][0])) {
-		shell_error(shell, "Supplied argument is not numeric");
-		return -EINVAL;
-	}
-
-	btn_idx = strtoul(argv[1], NULL, BASE_10);
-
-	if (btn_idx >= ARRAY_SIZE(btn_cfg)) {
-		shell_error(shell, "Selected button ID out of range");
-		return -EINVAL;
-	}
-
-	msg.button_pin = btn_cfg[btn_idx].btn_pin;
-	msg.button_action = BUTTON_PRESS;
-
-	ret = zbus_chan_pub(&button_chan, &msg, K_NO_WAIT);
-	if (ret) {
-		LOG_ERR("Failed to publish button msg, ret: %d", ret);
-	}
-
-	shell_print(shell, "Pushed button idx: %d pin: %d : %s", btn_idx, btn_cfg[btn_idx].btn_pin,
-		    btn_cfg[btn_idx].btn_name);
 
 	return 0;
 }
