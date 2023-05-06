@@ -35,11 +35,9 @@ static uint32_t fanRPM = 3200;
 #define LED0_NODE DT_ALIAS(led0)
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
-// #define GPIO_PORT DT_NODELABEL(gpio0)
 
 #define GPIO_BL_EN	20
 static int set_backlight(uint8_t brightness);
-static struct k_event ui_event;
 
 ZBUS_CHAN_DECLARE(button_chan);
 ZBUS_OBS_DECLARE(button_sub);
@@ -304,10 +302,20 @@ static void led_entry(void *p1, void *p2, void *p3)
 	}
 }
 
-static float volts = 0;
-static float amps = 0;
-static float watts = 0;
-static float energy = 0;
+struct electricity_msg {
+  float volts;
+  float amps;
+  float watts;
+  float energy;
+};
+
+ZBUS_CHAN_DECLARE(electricity_chan);
+ZBUS_OBS_DECLARE(electricity_sub);
+
+ZBUS_CHAN_DEFINE(electricity_chan, struct electricity_msg, NULL, NULL, ZBUS_OBSERVERS_EMPTY,
+		 ZBUS_MSG_INIT(0));
+#define CONFIG_ELECTRICITY_MSG_SUB_QUEUE_SIZE 4
+ZBUS_SUBSCRIBER_DEFINE(electricity_sub, CONFIG_ELECTRICITY_MSG_SUB_QUEUE_SIZE);
 
 static void psu_mon(void *p1, void *p2, void *p3)
 {
@@ -315,6 +323,10 @@ static void psu_mon(void *p1, void *p2, void *p3)
 	// ps.readEEPROM();
 	float Gain=1.14;
 	uint32_t start_time_ms = k_uptime_get();
+  float volts = 0;
+  float amps = 0;
+  float watts = 0;
+  float energy = 0;
 
 	while(1) {
 		int val;
@@ -342,7 +354,16 @@ static void psu_mon(void *p1, void *p2, void *p3)
 		float power = volts * amps;
 		energy += power * elapsed_time / 1000.0 / 3600;
 
-    k_event_set(&ui_event, 0x01);
+    struct electricity_msg msg;
+    msg.volts = volts;
+    msg.amps = amps;
+    msg.watts = watts;
+    msg.energy = energy;
+
+		ret = zbus_chan_pub(&electricity_chan, &msg, K_NO_WAIT);
+		if (ret) {
+			LOG_ERR("Failed to publish button msg, ret: %d", ret);
+		}
 		k_sleep(K_MSEC(500));
 	}
 }
@@ -444,8 +465,12 @@ static void button_msg_sub_thread(void)
 
 		switch (msg.button_pin) {
 		case BUTTON_A:
+      fanRPM += 1000;
+      ps.forceFanRPM(fanRPM);
 			break;
 		case BUTTON_B:
+      fanRPM -= 1000;
+      ps.forceFanRPM(fanRPM);
 			break;
 		case BUTTON_X:
       brightness += 2;
@@ -473,13 +498,16 @@ int main(void)
 		return -1;
 	}
 
-  k_event_init(&ui_event);
   pwm_rgb_led_init();
 	// pwm_led_init();
 	bl_init();
 	ui_init();
 	lv_task_handler();
 	display_blanking_off(display_dev);
+
+
+  ret = zbus_chan_add_obs(&button_chan, &button_sub, K_MSEC(200));
+  ret = zbus_chan_add_obs(&electricity_chan, &electricity_sub, K_MSEC(200));
 
 	k_thread_create(&led_thread, led_task_stack, STACKSIZE, led_entry, NULL, NULL,
 									NULL, K_PRIO_COOP(10), 0, K_NO_WAIT);
@@ -488,7 +516,6 @@ int main(void)
 	k_thread_create(&psu_mon_thread, psu_mon_stack, STACKSIZE, psu_mon, NULL, NULL,
 									NULL, K_PRIO_PREEMPT(0), 0, K_MSEC(1));
 
-  ret = zbus_chan_add_obs(&button_chan, &button_sub, K_MSEC(200));
   button_handler_init();
 	button_msg_sub_thread_id =
 		k_thread_create(&button_msg_sub_thread_data, button_msg_sub_thread_stack,
@@ -497,11 +524,23 @@ int main(void)
 				K_PRIO_PREEMPT(CONFIG_BUTTON_MSG_SUB_THREAD_PRIO), 0, K_NO_WAIT);
 	ret = k_thread_name_set(button_msg_sub_thread_id, "BUTTON_MSG_SUB");
 
-	uint32_t events;
 	char buf[32];
+	const struct zbus_channel *chan;
+  float volts = 0;
+  float amps = 0;
+  float watts = 0;
+  float energy = 0;
+
 	while (1) {
-    events = k_event_wait(&ui_event, 0x01, false, K_MSEC(100));
-    if (events) {
+		ret = zbus_sub_wait(&electricity_sub, &chan, K_FOREVER);
+		struct electricity_msg msg;
+		ret = zbus_chan_read(chan, &msg, K_MSEC(100));
+    if (ret == 0) {
+      volts = msg.volts;
+      amps = msg.amps;
+      watts = msg.watts;
+      energy = msg.energy;
+
       format_val(volts, buf);
       lv_label_set_text(ui_LabelVoltage, buf);
 
@@ -521,7 +560,7 @@ int main(void)
         lv_label_set_text(ui_Label8, "Wh");
       }
       lv_task_handler();
-      k_sleep(K_MSEC(100));
+      // k_sleep(K_MSEC(100));
     }
 	}
 
