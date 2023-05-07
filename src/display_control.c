@@ -88,9 +88,8 @@ void display_control_set_brightness(uint8_t percent)
     __ASSERT(percent >= 0 && percent <= 100, "Invalid range for brightness, valid range 0-100, was %d", percent);
     int ret;
     uint32_t step = display_blk.period / 100;
-    uint32_t pulse_width = step * (100 - percent);
-
-    printf("%d %d\n", percent, pulse_width);
+    // uint32_t pulse_width = step * (100 - percent);
+    uint32_t pulse_width = step * percent;
 
     last_brightness = percent;
     ret = pwm_set_pulse_dt(&display_blk, pulse_width);
