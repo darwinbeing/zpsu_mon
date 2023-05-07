@@ -2,6 +2,7 @@
 #define __WATCH_UI_H
 #include <inttypes.h>
 #include <stdbool.h>
+#include <events/psuctrl_event.h>
 
 void watchface_init(void);
 
@@ -25,6 +26,6 @@ void watchface_set_weather(int8_t temperature, int weather_code);
 
 void watchface_set_date(int day_of_week, int date);
 
-void watchface_set_ep(char *volts, char *amps, char *watts, char *energy);
+void watchface_set_ep(struct psuctrl_data_event *event);
 
 #endif

@@ -248,7 +248,14 @@ static void send_psuctrl_data_event(void)
         format_val(volts, evt.volts);
         format_val(amps, evt.amps);
         format_val(watts, evt.watts);
-        format_val(energy, evt.energy);
+        if(energy >= 1000) {
+                format_val(energy/1000, evt.energy);
+                evt.is_kWh = 1;
+        } else {
+                format_val(energy, evt.energy);
+                evt.is_kWh = 0;
+        }
+
         zbus_chan_pub(&psuctrl_data_chan, &evt, K_MSEC(250));
 }
 

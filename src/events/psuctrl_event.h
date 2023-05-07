@@ -10,6 +10,7 @@ struct psuctrl_data_event {
         char amps[8];
         char watts[8];
         char energy[8];
+        int is_kWh;
 };
 
 #ifdef __cplusplus

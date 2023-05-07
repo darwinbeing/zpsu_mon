@@ -307,10 +307,10 @@ static void zbus_psuctrl_data_callback(const struct zbus_channel *chan)
     if (running) {
         struct psuctrl_data_event *event = zbus_chan_msg(chan);
         // TODO Show some nice animation or similar
-        // LOG_WRN("PSU: %s %s %s %s", event->volts, event->amps, event->watts, event->energy);
+        // LOG_WRN("PSU: %s %s %s %s %d", event->volts, event->amps, event->watts, event->energy, event->is_kWh);
         /* __ASSERT(0 <= k_work_reschedule(&psuctrl_work.work, K_MSEC(10)), */
         /*              "Failed schedule status work"); */
-        watchface_set_ep(event->volts, event->amps, event->watts, event->energy);
+        watchface_set_ep(event);
         lvgl_update();
     }
 }

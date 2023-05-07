@@ -68,12 +68,18 @@ const lv_img_dsc_t *get_icon_from_weather_code(int code)
 {
 }
 
-void watchface_set_ep(char *volts, char *amps, char *watts, char *energy)
+void watchface_set_ep(struct psuctrl_data_event *evt)
 {
-        LOG_WRN("PSU: %s %s %s %s", volts, amps, watts, energy);
+        LOG_WRN("PSU: %s %s %s %s %d", evt->volts, evt->amps, evt->watts, evt->energy, evt->is_kWh);
 
-        lv_label_set_text(ui_LabelVoltage, volts);
-        lv_label_set_text(ui_LabelCurrent, amps);
-        lv_label_set_text(ui_LabelPower, watts);
-        lv_label_set_text(ui_LabelEnergy, energy);
+        lv_label_set_text(ui_LabelVoltage, evt->volts);
+        lv_label_set_text(ui_LabelCurrent, evt->amps);
+        lv_label_set_text(ui_LabelPower, evt->watts);
+        lv_label_set_text(ui_LabelEnergy, evt->energy);
+
+        if(evt->is_kWh) {
+                lv_label_set_text(ui_Label8, "kWh");
+        } else {
+                lv_label_set_text(ui_Label8, "Wh");
+        }
 }
