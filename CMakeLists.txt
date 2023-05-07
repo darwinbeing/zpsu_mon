@@ -5,9 +5,10 @@ cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(zpsu-mon)
 
-add_definitions(-DLV_LVGL_H_INCLUDE_SIMPLE)
-
+include_directories(src/)
 include_directories(src/ui)
 
 FILE(GLOB app_sources src/*.cpp src/*.c src/ui/*.c src/font/*.c)
 target_sources(app PRIVATE ${app_sources})
+
+add_compile_definitions(LV_LVGL_H_INCLUDE_SIMPLE)

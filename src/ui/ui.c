@@ -37,7 +37,7 @@ ui_Screen1 = lv_obj_create(NULL);
 lv_obj_clear_flag( ui_Screen1, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 lv_obj_set_style_bg_color(ui_Screen1, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_Screen1, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
-lv_obj_set_style_text_font(ui_Screen1, &lv_font_montserrat_36, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_Screen1, &ui_font_DSEG7ClassicBold36, LV_PART_MAIN| LV_STATE_DEFAULT);
 
 ui_LabelCurrent = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelCurrent, LV_SIZE_CONTENT);  /// 1

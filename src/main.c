@@ -4,6 +4,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/i2c.h>
 #include <zephyr/drivers/pwm.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/zbus/zbus.h>
 #include <lvgl.h>
 #include <stdio.h>
@@ -11,18 +12,38 @@
 #include <zephyr/kernel.h>
 #include <stdlib.h>
 #include <math.h>
-#include "ui.h"
 
+#include "ui.h"
 #include "button_handler.h"
 #include "button_assignments.h"
+#include <display_control.h>
 
-#define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
-#include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(app);
+#include "watchface_app.h"
+
+#include "psu_ctrl.h"
+
+// #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
+// LOG_MODULE_REGISTER(app);
+
+LOG_MODULE_REGISTER(main, LOG_LEVEL_WRN);
+
+#define RENDER_INTERVAL_LVGL    K_MSEC(100)
+
+typedef enum ui_state {
+    INIT_STATE,
+    SETTINGS_STATE,
+    WATCHFACE_STATE,
+    APPLICATION_MANAGER_STATE,
+    NOTIFCATION_STATE,
+    NOTIFCATION_LIST_STATE,
+} ui_state_t;
+
+void run_init_work(struct k_work *item);
+static int pwm_rgb_led_init(void);
+static int bl_init();
 
 static const struct pwm_dt_spec pwm_led0 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led0));
 static const struct pwm_dt_spec pwm_led1 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_led1));
-
 
 static uint32_t count;
 static uint8_t brightness = 0;
@@ -39,6 +60,10 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 #define GPIO_BL_EN	20
 static int set_backlight(uint8_t brightness);
 
+static ui_state_t watch_state = INIT_STATE;
+
+K_WORK_DEFINE(init_work, run_init_work);
+
 ZBUS_CHAN_DECLARE(button_chan);
 ZBUS_OBS_DECLARE(button_sub);
 
@@ -51,181 +76,65 @@ static k_tid_t button_msg_sub_thread_id;
 
 K_THREAD_STACK_DEFINE(button_msg_sub_thread_stack, CONFIG_BUTTON_MSG_SUB_STACK_SIZE);
 
-class PowerSupply {
- public:
-	PowerSupply(uint8_t i2cbus = 0, uint8_t address = 7) : address_(0x58 + address), EEaddress_(0x50 + address) {
-		const struct device *dev = DEVICE_DT_GET(DT_NODELABEL(i2c0));
-		if (!dev) {
-			printf("Failed to get I2C device binding\n");
-			return;
-		}
+// static PSUCtrl ps=PSUCtrl(0, 7);
 
-		this->i2cdev_ = dev;
-		this->numReg_ = 0x58 / 2;
-		// this->lastReg_ = (uint16_t *)k_malloc(this->numReg_);
-		// memset(this->lastReg_, 0, this->numReg_ * sizeof(uint16_t));
-		// this->minReg_ = (uint16_t*) k_malloc(this->numReg_);
-		// memset(this->minReg_, 0xff, this->numReg_ * sizeof(uint16_t));
-		// this->maxReg_ = (uint16_t*)k_malloc(this->numReg_);
-		// memset(this->maxReg_, 0, this->numReg_ * sizeof(uint16_t));
+void run_init_work(struct k_work *item)
+{
+  // k_sleep(K_MSEC(5000));
 
-		this->lastReg_ = new uint16_t[this->numReg_];
-		memset(this->lastReg_, 0, this->numReg_ * sizeof(uint16_t));
-		this->minReg_ = new uint16_t[this->numReg_];
-		memset(this->minReg_, 0xff, this->numReg_ * sizeof(uint16_t));
-		this->maxReg_ = new uint16_t[this->numReg_];
-		memset(this->maxReg_, 0, this->numReg_ * sizeof(uint16_t));
+        // struct device *gpio_dev  = DEVICE_DT_GET(DT_NODELABEL(gpio0));
+        // gpio_pin_configure(gpio_dev, DT_GPIO_PIN(DT_ALIAS(led2), gpios), GPIO_OUTPUT | GPIO_OUTPUT_HIGH);
+        // gpio_pin_configure(gpio_dev, DT_GPIO_PIN(DT_ALIAS(led3), gpios), GPIO_OUTPUT | GPIO_OUTPUT_HIGH);
+        // gpio_pin_configure(gpio_dev, DT_GPIO_PIN(DT_ALIAS(led4), gpios), GPIO_OUTPUT | GPIO_OUTPUT_HIGH);
 
-		k_mutex_init(&mutex_);
+        pwm_rgb_led_init();
+	// pwm_led_init();
+	// bl_init();
+	// ui_init();
+	// lv_task_handler();
 
-	}
-	int deviceIsReady() {
-		if (!device_is_ready(this->i2cdev_)) {
-			printf("I2C device is not ready\n");
-			return 0;
-		}
-		return 1;
-	}
+	// const struct device *display_dev;
+	// display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
+	// if (!device_is_ready(display_dev)) {
+	// 	LOG_ERR("Device not ready, aborting test");
+	// 	return;
+	// }
 
-	~PowerSupply() {
-		delete[] lastReg_;
-		delete[] minReg_;
-		delete[] maxReg_;
+	// display_blanking_off(display_dev);
 
-		// free(lastReg_);
-		// free(minReg_);
-		// free(maxReg_);
-	}
 
-	int readEEPROM() {
-		uint8_t data[256];
+    // load_retention_ram();
+    // heart_rate_sensor_init();
+    // notifications_page_init(on_notification_page_close, on_notification_page_notification_close);
+    // notification_manager_init();
+    // enable_bluetoth();
+    // accelerometer_init();
+    // magnetometer_init();
+    // pressure_sensor_init();
+    // clock_init(retained.current_time_seconds);
+    // buttonsInit(&onButtonPressCb);
+    // vibration_motor_init();
+    // vibration_motor_set_on(false);
 
-		// k_mutex_lock(&this->mutex_, K_FOREVER);
-		if(k_mutex_lock(&this->mutex_, K_MSEC(100))) {
-			printf("i2c mutex lock failed\n");
-			return -1;
-		}
+    // Not to self, PWM consumes like 250uA...
+    // Need to disable also when screen is off.
+    display_control_init();
+    display_control_power_on(true);
+    // lv_indev_drv_init(&enc_drv);
+    // enc_drv.type = LV_INDEV_TYPE_ENCODER;
+    // enc_drv.read_cb = enocoder_read;
+    // enc_drv.feedback_cb = encoder_vibration;
+    // enc_indev = lv_indev_drv_register(&enc_drv);
 
-		if (i2c_burst_read(this->i2cdev_, this->EEaddress_, 0, data, 256)) {
-			printf("Failed to read EEPROM\n");
-			k_mutex_unlock(&this->mutex_);
-			return -2;
-		}
+    // input_group = lv_group_create();
+    // lv_group_set_default(input_group);
+    // lv_indev_set_group(enc_indev, input_group);
 
-		k_mutex_unlock(&this->mutex_);
-		printf("%02x", data[0]);
-		for (int i = 1; i < 256; i++) {
-			printf(" %02x", data[i]);
-		}
-		printf("\n");
-		return 0;
-	}
+    watch_state = WATCHFACE_STATE;
+    // watchface_app_start(input_group);
+    watchface_app_start(NULL);
+}
 
-	int readVar(uint8_t address, uint8_t* writeInts, uint32_t writeLen, uint8_t* data, uint32_t readCount) {
-		struct i2c_msg msgs[] = {
-			{
-				.buf = writeInts,
-				.len = writeLen,
-				.flags = I2C_MSG_WRITE,
-			},
-			{
-				.buf = data,
-				.len = readCount,
-				.flags = I2C_MSG_READ | I2C_MSG_RESTART | I2C_MSG_STOP,
-			}
-		};
-		// k_mutex_lock(&this->mutex_, K_FOREVER);
-		if(k_mutex_lock(&this->mutex_, K_MSEC(100))) {
-			printf("i2c mutex lock failed\n");
-			return -1;
-		}
-		if (i2c_transfer(this->i2cdev_, &msgs[0], 2, address)) {
-			printf("Failed to read variable\n");
-			k_mutex_unlock(&this->mutex_);
-			return -1;
-		}
-
-		k_mutex_unlock(&this->mutex_);
-
-		return 0;
-	}
-
-	int writeVar(uint8_t address, uint8_t* data, uint32_t len) {
-		uint8_t reg = data[0];
-		uint8_t *buf = &data[1];
-
-		// k_mutex_lock(&this->mutex_, K_FOREVER);
-		if(k_mutex_lock(&this->mutex_, K_MSEC(100))) {
-			printf("i2c mutex lock failed\n");
-			return -1;
-		}
-
-		if (i2c_burst_write(this->i2cdev_, address, reg, (uint8_t *)buf, len - 1)) {
-			k_mutex_unlock(&this->mutex_);
-			return -1;
-		}
-		k_mutex_unlock(&this->mutex_);
-
-		return 0;
-	}
-
-	int readDPS1200(uint8_t reg, uint8_t* data, uint32_t count) {
-		uint8_t cs = reg + (this->address_ << 1);
-		uint8_t regCS = ((0xff - cs) + 1) & 0xff;
-
-		uint8_t writeInts[] = { reg, regCS };
-		return this->readVar(this->address_, writeInts, 2, data, count);
-	}
-
-	int readDPS1200Register(uint8_t reg, int *value) {
-		uint8_t data[3];
-		int ret = this->readDPS1200(reg<<1, data, 3);	 // if low bit set returns zeros (so use even # cmds)
-		if(ret < 0) {
-			return -1;
-		}
-
-		int replyCS = 0;
-		for(int i=0; i < sizeof(data); i++) {
-			replyCS+=data[i];
-		}
-
-		replyCS=((0xff-replyCS)+1)&0xff;	//check reply checksum (not really reqd)
-		if(replyCS!=0) {
-			printf("Read error");
-			return -2;
-		}
-		*value=data[0] | data[1]<<8;
-		return 0;
-
-	}
-
-	int writeDPS1200(uint8_t reg, int value) {
-		uint8_t valLSB = value&0xff;
-		uint8_t valMSB=value>>8;
-		uint8_t cs=(this->address_<<1)+reg+valLSB+valMSB;
-		uint8_t regCS=((0xff-cs)+1)&0xff;
-		uint8_t writeInts[] = {reg,valLSB,valMSB,regCS};
-		return this->writeVar(this->address_, writeInts, 4);
-	}
-
-	int forceFanRPM(int rpm) {
-		this->writeDPS1200(0x40,rpm);
-		return 0;
-	}
-
- private:
-	const struct device *i2cdev_;
-	int i2cbus_;
-	int address_;
-	int EEaddress_;
-	int numReg_;
-	uint16_t* lastReg_;
-	uint16_t* minReg_;
-	uint16_t* maxReg_;
-	struct k_mutex mutex_;
-};
-
-static PowerSupply ps=PowerSupply(0, 7);
 
 static int bl_init()
 {
@@ -328,44 +237,44 @@ static void psu_mon(void *p1, void *p2, void *p3)
   float watts = 0;
   float energy = 0;
 
-	while(1) {
-		int val;
-		int ret;
+	// while(1) {
+	// 	int val;
+	// 	int ret;
 
-		ret=ps.readDPS1200Register(7, &val);
-		if(!ret) {
-			volts = val;
-			volts = volts*Gain/253.9;
-		}
-		ret=ps.readDPS1200Register(8, &val);
-		if(!ret) {
-			amps = val;
-			amps = amps/64.0;
-		}
+	// 	ret=ps.readDPS1200Register(7, &val);
+	// 	if(!ret) {
+	// 		volts = val;
+	// 		volts = volts*Gain/253.9;
+	// 	}
+	// 	ret=ps.readDPS1200Register(8, &val);
+	// 	if(!ret) {
+	// 		amps = val;
+	// 		amps = amps/64.0;
+	// 	}
 
-		ret=ps.readDPS1200Register(9, &val);
-		if(!ret) {
-			watts = val;
-		}
-		uint32_t end_time_ms = k_uptime_get();
-		uint32_t elapsed_time = end_time_ms - start_time_ms;
-		start_time_ms = end_time_ms;
+	// 	ret=ps.readDPS1200Register(9, &val);
+	// 	if(!ret) {
+	// 		watts = val;
+	// 	}
+	// 	uint32_t end_time_ms = k_uptime_get();
+	// 	uint32_t elapsed_time = end_time_ms - start_time_ms;
+	// 	start_time_ms = end_time_ms;
 
-		float power = volts * amps;
-		energy += power * elapsed_time / 1000.0 / 3600;
+	// 	float power = volts * amps;
+	// 	energy += power * elapsed_time / 1000.0 / 3600;
 
-    struct electricity_msg msg;
-    msg.volts = volts;
-    msg.amps = amps;
-    msg.watts = watts;
-    msg.energy = energy;
+  //   struct electricity_msg msg;
+  //   msg.volts = volts;
+  //   msg.amps = amps;
+  //   msg.watts = watts;
+  //   msg.energy = energy;
 
-		ret = zbus_chan_pub(&electricity_chan, &msg, K_NO_WAIT);
-		if (ret) {
-			LOG_ERR("Failed to publish button msg, ret: %d", ret);
-		}
-		k_sleep(K_MSEC(500));
-	}
+	// 	ret = zbus_chan_pub(&electricity_chan, &msg, K_NO_WAIT);
+	// 	if (ret) {
+	// 		LOG_ERR("Failed to publish button msg, ret: %d", ret);
+	// 	}
+	// 	k_sleep(K_MSEC(500));
+	// }
 }
 
 #define max(a,b) ((a) >= (b) ? (a) : (b))
@@ -388,9 +297,9 @@ static const struct pwm_dt_spec blue_pwm_led = PWM_DT_SPEC_GET(DT_ALIAS(blue_pwm
 
 #define STEP_SIZE PWM_USEC(2000)
 
-int pwm_rgb_led_init(void)
+static int pwm_rgb_led_init(void)
 {
-	uint32_t pulse_red = PWM_MSEC(20), pulse_green = PWM_MSEC(20), pulse_blue = PWM_MSEC(20); /* pulse widths */
+	// uint32_t pulse_red = PWM_MSEC(20), pulse_green = PWM_MSEC(20), pulse_blue = PWM_MSEC(20); /* pulse widths */
 	int ret;
 
 	printk("PWM-based RGB LED control\n");
@@ -402,6 +311,7 @@ int pwm_rgb_led_init(void)
 		return 0;
 	}
 
+        uint32_t pulse_red = red_pwm_led.period, pulse_green = green_pwm_led.period, pulse_blue = blue_pwm_led.period; /* pulse widths */
   ret = pwm_set_pulse_dt(&red_pwm_led, pulse_red);
   if (ret != 0) {
     printk("Error %d: red write failed\n", ret);
@@ -464,14 +374,14 @@ static void button_msg_sub_thread(void)
 		}
 
 		switch (msg.button_pin) {
-		case BUTTON_A:
-      fanRPM += 1000;
-      ps.forceFanRPM(fanRPM);
-			break;
-		case BUTTON_B:
-      fanRPM -= 1000;
-      ps.forceFanRPM(fanRPM);
-			break;
+		// case BUTTON_A:
+    //   fanRPM += 1000;
+    //   ps.forceFanRPM(fanRPM);
+		// 	break;
+		// case BUTTON_B:
+    //   fanRPM -= 1000;
+    //   ps.forceFanRPM(fanRPM);
+		// 	break;
 		case BUTTON_X:
       brightness += 2;
       set_backlight(brightness);
@@ -487,7 +397,7 @@ static void button_msg_sub_thread(void)
 }
 
 
-int main(void)
+int main2(void)
 {
 	int ret;
 	const struct device *display_dev;
@@ -564,4 +474,16 @@ int main(void)
     }
 	}
 
+}
+
+
+int main(void)
+{
+    // The init code requires a bit of stack.
+    // So in order to not increase CONFIG_MAIN_STACK_SIZE and loose
+    // this RAM forever, instead re-use the system workqueue for init
+    // it has the required amount of stack.
+    k_work_submit(&init_work);
+
+    return 0;
 }
