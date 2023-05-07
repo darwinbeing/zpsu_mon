@@ -110,8 +110,8 @@ static int watchface_app_init(const struct device *arg)
 void watchface_app_start(lv_group_t *group)
 {
     general_work_item.type = OPEN_WATCHFACE;
-    // __ASSERT(0 <= k_work_schedule(&general_work_item.work, K_MSEC(100)), "FAIL schedule");
-    __ASSERT(0 <= k_work_schedule(&general_work_item.work, K_NO_WAIT), "FAIL schedule");
+    __ASSERT(0 <= k_work_schedule(&general_work_item.work, K_MSEC(100)), "FAIL schedule");
+    // __ASSERT(0 <= k_work_schedule(&general_work_item.work, K_NO_WAIT), "FAIL schedule");
 }
 
 void watchface_app_stop(void)

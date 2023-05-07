@@ -55,8 +55,8 @@ K_WORK_DEFINE(init_work, run_init_work);
 #define CONFIG_BUTTON_PSUCTRL_THREAD_PRIO 8
 #define CONFIG_BUTTON_PSUCTRL_STACK_SIZE 1024
 
-K_THREAD_DEFINE(psuCtrlThreadId, CONFIG_BUTTON_PSUCTRL_STACK_SIZE,
-                psuctrl_init, NULL, NULL, NULL, CONFIG_BUTTON_PSUCTRL_THREAD_PRIO, 0, K_TICKS_FOREVER);
+// K_THREAD_DEFINE(psuCtrlThreadId, CONFIG_BUTTON_PSUCTRL_STACK_SIZE,
+//                 psuctrl_init, NULL, NULL, NULL, CONFIG_BUTTON_PSUCTRL_THREAD_PRIO, 0, K_TICKS_FOREVER);
 
 void run_init_work(struct k_work *item)
 {
@@ -68,7 +68,7 @@ void run_init_work(struct k_work *item)
         display_control_power_on(true);
         watch_state = WATCHFACE_STATE;
         watchface_app_start(NULL);
-        k_thread_start(psuCtrlThreadId);
+        // k_thread_start(psuCtrlThreadId);
 }
 
 static int pwm_rgb_led_init(void)

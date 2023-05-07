@@ -272,4 +272,4 @@ int psuctrl_init(void)
         k_work_schedule(&psuctrl_work, K_MSEC(1));
 }
 
-// SYS_INIT(psuctrl_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+SYS_INIT(psuctrl_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
