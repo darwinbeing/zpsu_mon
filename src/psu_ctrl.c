@@ -7,6 +7,16 @@
 
 LOG_MODULE_REGISTER(PSUCtrl, LOG_LEVEL_WRN);
 
+static int PSUCtrl_deviceIsReady();
+static int PSUCtrl_readEEPROM();
+static int PSUCtrl_readVar(uint8_t address, uint8_t* writeInts, uint32_t writeLen, uint8_t* data, uint32_t readCount);
+static int PSUCtrl_writeVar(uint8_t address, uint8_t* data, uint32_t len);
+static int PSUCtrl_readDPS1200(uint8_t reg, uint8_t* data, uint32_t count);
+static int PSUCtrl_readDPS1200Register(uint8_t reg, int *value);
+static int PSUCtrl_writeDPS1200(uint8_t reg, int value);
+static int PSUCtrl_deinit(void);
+
+
 static const struct device *i2cdev_;
 static int i2cbus_;
 static int address_;
@@ -248,11 +258,11 @@ static void psuctrl_work_cb(struct k_work *work)
         k_work_schedule(&psuctrl_work, K_MSEC(PSUCTRL_INTERVAL_MS));
 }
 
-static int psuctrl_init(void)
+int psuctrl_init(void)
 {
         start_time_ms = k_uptime_get();
         PSUCtrl_init(0, 7);
         k_work_schedule(&psuctrl_work, K_MSEC(1));
 }
 
-SYS_INIT(psuctrl_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+// SYS_INIT(psuctrl_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
