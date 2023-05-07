@@ -299,7 +299,7 @@ static const struct pwm_dt_spec blue_pwm_led = PWM_DT_SPEC_GET(DT_ALIAS(blue_pwm
 
 static int pwm_rgb_led_init(void)
 {
-	// uint32_t pulse_red = PWM_MSEC(20), pulse_green = PWM_MSEC(20), pulse_blue = PWM_MSEC(20); /* pulse widths */
+	uint32_t pulse_red = 0, pulse_green = 0, pulse_blue = 0; /* pulse widths */
 	int ret;
 
 	printk("PWM-based RGB LED control\n");
@@ -311,7 +311,7 @@ static int pwm_rgb_led_init(void)
 		return 0;
 	}
 
-        uint32_t pulse_red = red_pwm_led.period, pulse_green = green_pwm_led.period, pulse_blue = blue_pwm_led.period; /* pulse widths */
+        // uint32_t pulse_red = red_pwm_led.period, pulse_green = green_pwm_led.period, pulse_blue = blue_pwm_led.period; /* pulse widths */
   ret = pwm_set_pulse_dt(&red_pwm_led, pulse_red);
   if (ret != 0) {
     printk("Error %d: red write failed\n", ret);
