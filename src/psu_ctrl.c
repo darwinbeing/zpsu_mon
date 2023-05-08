@@ -4,6 +4,7 @@
 
 #include "psu_ctrl.h"
 #include <events/psuctrl_event.h>
+#include <zephyr/random/rand32.h>
 
 LOG_MODULE_REGISTER(PSUCtrl, LOG_LEVEL_WRN);
 
@@ -205,19 +206,6 @@ static float watts = 0;
 static float energy = 0;
 static uint64_t start_time_ms;
 
-#define max(a,b) ((a) >= (b) ? (a) : (b))
-static int format_val(float num, char *buf) {
-	if(num <= 0) {
-		sprintf(buf, "%s", "00.00");
-	} else if(0 < num && num < 1) {
-		sprintf(buf, "%.3f", num);
-	} else {
-		sprintf(buf, "%.*f", max(0, 3 - (int)(floor(log10(abs(num))))), num);
-	}
-
-	return 0;
-}
-
 static void send_psuctrl_data_event(void)
 {
         int val;
@@ -233,7 +221,6 @@ static void send_psuctrl_data_event(void)
                 amps = val;
                 amps = amps/64.0;
         }
-
         ret=PSUCtrl_readDPS1200Register(9, &val);
         if(!ret) {
                 watts = val;
@@ -244,15 +231,19 @@ static void send_psuctrl_data_event(void)
 
         float power = volts * amps;
         energy += power * elapsed_time / 1000.0 / 3600;
-        struct psuctrl_data_event evt;
-        format_val(volts, evt.volts);
-        format_val(amps, evt.amps);
-        format_val(watts, evt.watts);
+
+        struct psuctrl_data_event evt = {
+                .volts = volts,
+                .amps = amps,
+                .watts = watts,
+                .energy = energy,
+                .is_kWh = 0
+        };
+
         if(energy >= 1000) {
-                format_val(energy/1000, evt.energy);
+                evt.energy /= 1000;
                 evt.is_kWh = 1;
         } else {
-                format_val(energy, evt.energy);
                 evt.is_kWh = 0;
         }
 

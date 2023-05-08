@@ -82,6 +82,9 @@ void display_control_power_on(bool on)
 
 void display_control_set_brightness(uint8_t percent)
 {
+/* Led PWM period, calculated for 1kHz signal - in microseconds. */
+#define LED_PWM_PERIOD_US               (1000U)
+
     if (!device_is_ready(display_blk.dev)) {
         return;
     }
@@ -92,7 +95,13 @@ void display_control_set_brightness(uint8_t percent)
     uint32_t pulse_width = step * percent;
 
     last_brightness = percent;
-    ret = pwm_set_pulse_dt(&display_blk, pulse_width);
+
+    uint32_t period = PWM_USEC(LED_PWM_PERIOD_US);
+    step = period / 100;
+    pulse_width = step * percent;
+    ret = pwm_set_dt(&display_blk, period, pulse_width);
+
+    // ret = pwm_set_pulse_dt(&display_blk, pulse_width);
     __ASSERT(ret == 0, "pwm error: %d for pulse: %d", ret, pulse_width);
 }
 

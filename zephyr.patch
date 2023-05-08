@@ -3,9 +3,9 @@ index 74cf471783..cc2d11900e 100644
 --- a/drivers/i2c/i2c_dw.c
 +++ b/drivers/i2c/i2c_dw.c
 @@ -40,6 +40,10 @@ LOG_MODULE_REGISTER(i2c_dw);
- 
+
  #include "i2c-priv.h"
- 
+
 +
 +#define I2C_TRANSFER_TIMEOUT_MSEC		K_MSEC(500)
 +
@@ -15,7 +15,7 @@ index 74cf471783..cc2d11900e 100644
  	return (uint32_t)DEVICE_MMIO_GET(dev);
 @@ -537,8 +541,12 @@ static int i2c_dw_transfer(const struct device *dev,
  		}
- 
+
  		/* Wait for transfer to be done */
 -		k_sem_take(&dw->device_sync_sem, K_FOREVER);
 -
@@ -39,4 +39,3 @@ index f9a471d022..5555a04595 100644
 +  zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:-DPATH_MAX=256>)
    zephyr_compile_options($<$<COMPILE_LANGUAGE:CXX>:-D_POSIX_THREADS>)
  endif()
- 

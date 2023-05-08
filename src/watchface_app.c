@@ -311,6 +311,7 @@ static void zbus_psuctrl_data_callback(const struct zbus_channel *chan)
         /* __ASSERT(0 <= k_work_reschedule(&psuctrl_work.work, K_MSEC(10)), */
         /*              "Failed schedule status work"); */
         watchface_set_ep(event);
+        lvgl_update();
     }
 }
 
