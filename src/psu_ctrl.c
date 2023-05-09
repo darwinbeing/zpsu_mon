@@ -199,7 +199,8 @@ ZBUS_CHAN_DECLARE(psuctrl_data_chan);
 static void psuctrl_work_cb(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(psuctrl_work, psuctrl_work_cb);
 
-static float Gain=1.14;
+// static float Gain=1.14;
+static float Gain=1.1723;
 static float volts = 0;
 static float amps = 0;
 static float watts = 0;

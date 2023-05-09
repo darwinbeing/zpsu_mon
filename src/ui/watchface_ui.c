@@ -88,7 +88,6 @@ static int format_val(float num, char *buf) {
 
 void watchface_set_ep(struct psuctrl_data_event *evt)
 {
-        float Gain=1.14;
         char buf[32];
 
         LOG_DBG("PSU: %f %f %f %f %d", evt->volts, evt->amps, evt->watts, evt->energy, evt->is_kWh);
