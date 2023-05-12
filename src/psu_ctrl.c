@@ -109,10 +109,22 @@ int PSUCtrl_readVar(uint8_t address, uint8_t* writeInts, uint32_t writeLen, uint
                 printf("i2c mutex lock failed\n");
                 return -1;
         }
-        if (i2c_transfer(i2cdev_, &msgs[0], 2, address)) {
-                printf("Failed to read variable\n");
+        // if (i2c_transfer(i2cdev_, &msgs[0], 2, address)) {
+        //         printf("Failed to read variable\n");
+        //         k_mutex_unlock(&mutex_);
+        //         return -1;
+        // }
+
+        if(i2c_write(i2cdev_, writeInts, writeLen, address)) {
+                printf("Failed to write i2c\n");
                 k_mutex_unlock(&mutex_);
                 return -1;
+        }
+
+        if(i2c_read(i2cdev_, data, readCount, address)) {
+                printf("Failed to read i2c\n");
+                k_mutex_unlock(&mutex_);
+                return -2;
         }
 
         k_mutex_unlock(&mutex_);
@@ -261,7 +273,7 @@ int psuctrl_init(void)
 {
         start_time_ms = k_uptime_get();
         PSUCtrl_init(0, 7);
-        k_work_schedule(&psuctrl_work, K_MSEC(1));
+        k_work_schedule(&psuctrl_work, K_MSEC(10));
 }
 
-SYS_INIT(psuctrl_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
+// SYS_INIT(psuctrl_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);

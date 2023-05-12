@@ -61,6 +61,7 @@ K_WORK_DEFINE(init_work, run_init_work);
 void run_init_work(struct k_work *item)
 {
         pwm_rgb_led_init();
+        psuctrl_init();
         buttonsInit(&onButtonPressCb);
         // Not to self, PWM consumes like 250uA...
         // Need to disable also when screen is off.
