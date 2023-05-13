@@ -238,9 +238,8 @@ static void send_psuctrl_data_event(void)
         if(!ret) {
                 watts = val;
         }
-        uint64_t end_time_ms = k_uptime_get();
-        uint64_t elapsed_time = end_time_ms - start_time_ms;
-        start_time_ms = end_time_ms;
+        uint64_t elapsed_time = k_uptime_delta(&start_time_ms);
+        start_time_ms = k_uptime_get();
 
         float power = volts * amps;
         energy += power * elapsed_time / 1000.0 / 3600;
