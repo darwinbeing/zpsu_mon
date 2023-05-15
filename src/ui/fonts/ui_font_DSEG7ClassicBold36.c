@@ -4,7 +4,7 @@
  * Opts: --bpp 8 --size 36 --font /Users/Thomas/Developer/HP-HSTNS-PLXX/HPServerPSUHack/pico/ui/assets/fonts-DSEG_v050b1/DSEG7-Classic/DSEG7Classic-Bold.ttf -o /Users/Thomas/Developer/HP-HSTNS-PLXX/HPServerPSUHack/pico/ui/assets/fonts-DSEG_v050b1/DSEG7-Classic/ui_font_DSEG7ClassicBold36.c --format lvgl -r 0x20-0x7f --no-compress --no-prefilter
  ******************************************************************************/
 
-#include "ui.h"
+#include "../ui.h"
 
 #ifndef UI_FONT_DSEG7CLASSICBOLD36
 #define UI_FONT_DSEG7CLASSICBOLD36 1
