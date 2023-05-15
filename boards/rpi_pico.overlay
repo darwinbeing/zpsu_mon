@@ -91,7 +91,7 @@
 	st7789v: st7789v@0 {
 		compatible = "sitronix,st7789v";
 		reg = <0>;
-		spi-max-frequency = <20000000>; /* 20MHz */
+		spi-max-frequency = <48000000>; /* 48MHz */
 		cmd-data-gpios = <&gpio0 16 GPIO_ACTIVE_LOW>;	/* DET */
 		/* reset-gpios = <&gpio0 25 GPIO_ACTIVE_LOW>; */	/* RESX reset */
 		width = <240>;
