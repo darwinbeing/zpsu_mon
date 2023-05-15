@@ -1,1 +1,1 @@
-# zephyr_rpi-pico_display_pack
+# HP HSTNS-PL30 DIY Raspberry Pi Pico Watt Meter
