@@ -5,8 +5,8 @@
 
 ### Build on Mac OS
 
-1. Create an Anaconda virtual environment
-
+1. Create an Anaconda virtual environment  
+[Download Anaconda for Mac(Intel)](https://repo.anaconda.com/archive/Anaconda3-2024.02-1-MacOSX-x86_64.pkg)  
 2. Installing Dependencies  
 brew install cmake dtc
 
@@ -25,7 +25,7 @@ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
 export GNUARMEMB_TOOLCHAIN_PATH=~/zephyrproject/arm-gnu-toolchain-13.2.Rel1-darwin-x86_64-arm-none-eabi  
 
 5. Clone repo  
-git clone https://github.com/darwinbeing/zpsu_mon ~/  
+git clone https://github.com/darwinbeing/zpsu_mon.git ~/  
 
 6. Compile  
 cd ~/zpsu_mon  
