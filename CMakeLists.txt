@@ -5,15 +5,6 @@ cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(zpsu-mon)
 
-add_compile_definitions(LV_LVGL_H_INCLUDE_SIMPLE)
-
-if(CONFIG_POSIX_API OR CONFIG_PTHREAD_IPC OR CONFIG_POSIX_CLOCK OR
-  CONFIG_POSIX_MQUEUE OR CONFIG_POSIX_FS OR CONFIG_EVENTFD OR CONFIG_GETOPT)
-  # This is a temporary workaround so that Newlib declares the appropriate
-  # types for us. POSIX features to be formalized as part of #51211
-  zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:-DPATH_MAX=256>)
-endif()
-
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_SOURCE_DIR}/src/ui
@@ -39,3 +30,5 @@ set(app_SRCS
 target_sources(app PRIVATE ${app_SRCS})
 
 # add_subdirectory(src/ui)
+
+add_compile_definitions(LV_LVGL_H_INCLUDE_SIMPLE)
