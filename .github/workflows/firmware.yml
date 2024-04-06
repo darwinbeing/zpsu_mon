@@ -1,0 +1,74 @@
+name: GenFirmware
+
+on:
+  workflow_dispatch:
+    inputs:
+      zephyr_tag:
+        description: "Zephyr Tag"
+        required: true
+        default: "v3.4.0"
+        type: string
+      prerelease:
+        description: "Release as Prerelease"
+        required: true
+        default: true
+        type: boolean
+
+jobs:
+  build:
+    permissions:
+      contents: write  # for actions/upload-release-asset to upload release asset
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        gcc: ['13.2.Rel1']
+        # gcc: ['10-2020-q4', 'latest']
+    steps:
+      - name: Clone Repository
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install GNU Arm Embedded Toolchain - ${{ matrix.gcc }}
+        uses: carlosperate/arm-none-eabi-gcc-action@v1
+        with:
+          release: ${{ matrix.gcc }}
+          path-env-var: ARM_NONE_EABI_GCC_PATH
+      - name: The path will be exported to that environmental variable name
+        run: echo "The output path is $ARM_NONE_EABI_GCC_PATH"
+      - name: Create Firmware Package
+        run: |
+          echo "Building Firmware"
+          echo "VERSION=1.0" >> $GITHUB_ENV
+          brew install ninja ccache dtc
+          pip install west
+          west init --mr "${{ inputs.zephyr_tag }}" zephyrproject
+          cd zephyrproject
+          west update
+          cd ..
+          pip install -r zephyrproject/zephyr/scripts/requirements.txt
+
+          arm_none_eabi_gcc_path=${ARM_NONE_EABI_GCC_PATH%/*}
+          export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
+          export GNUARMEMB_TOOLCHAIN_PATH="$arm_none_eabi_gcc_path"
+
+          source zephyrproject/zephyr/zephyr-env.sh
+          west build -p -b rpi_pico
+      - name: Delete existing release and tag
+        id: delete-tag-release
+        uses: dev-drprasad/delete-tag-and-release@v1.0.1
+        with:
+          tag_name: "${{ env.VERSION }}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          delete_release: true
+        continue-on-error: true
+      - name: Upload Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "${{ env.VERSION }}"
+          release_name: "Release ${{ env.VERSION }}"
+          body: "This is my release text"
+          file: build/zephyr/zephyr.uf2
+          asset_name: zephyr.uf2
+          overwrite: true
