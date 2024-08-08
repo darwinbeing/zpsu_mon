@@ -30,7 +30,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install GNU Arm Embedded Toolchain - ${{ matrix.gcc }}
-        uses: carlosperate/arm-none-eabi-gcc-action@v1
+        uses: carlosperate/arm-none-eabi-gcc-action@v1.8.2
         with:
           release: ${{ matrix.gcc }}
           path-env-var: ARM_NONE_EABI_GCC_PATH
