@@ -2,6 +2,12 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
+if(CONFIG_PICO_DISPLAY_PACK)
+  set(DTC_OVERLAY_FILE "pico_display_pack.overlay")
+elseif(CONFIG_PICO_DISPLAY_PACK2)
+  set(DTC_OVERLAY_FILE "pico_display_pack2.overlay")
+endif()
+
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(zpsu-mon)
 

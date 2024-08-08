@@ -53,7 +53,8 @@ jobs:
           export GNUARMEMB_TOOLCHAIN_PATH="$arm_none_eabi_gcc_path"
 
           source zephyrproject/zephyr/zephyr-env.sh
-          west build -p -b rpi_pico
+          west build -b rpi_pico -d build_lcd1 -- -DCONFIG_PICO_DISPLAY_PACK=y
+          west build -b rpi_pico -d build_lcd2 -- -DCONFIG_PICO_DISPLAY_PACK2=y
       - name: Delete existing release and tag
         id: delete-tag-release
         uses: dev-drprasad/delete-tag-and-release@v1.1
@@ -69,6 +70,16 @@ jobs:
           tag: "${{ env.VERSION }}"
           release_name: "Release ${{ env.VERSION }}"
           body: "This is my release text"
-          file: build/zephyr/zephyr.uf2
-          asset_name: zephyr.uf2
+          file: build_lcd1/zephyr/zephyr.uf2
+          asset_name: zephyr_pico_display_pack.uf2
+          overwrite: true
+      - name: Upload Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: "${{ env.VERSION }}"
+          release_name: "Release ${{ env.VERSION }}"
+          body: "This is my release text"
+          file: build_lcd2/zephyr/zephyr.uf2
+          asset_name: zephyr_pico_display_pack2.uf2
           overwrite: true

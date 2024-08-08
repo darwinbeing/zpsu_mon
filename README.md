@@ -29,5 +29,10 @@ git clone https://github.com/darwinbeing/zpsu_mon.git ~/
 
 6. Compile  
 cd ~/zpsu_mon  
-source ~/zephyrproject/zephyr/zephyr-env.sh  
-west build -p -b rpi_pico  
+source ~/zephyrproject/zephyr/zephyr-env.sh 
+
+Pico Display Pack 
+west build -b rpi_pico -d build_lcd1 -- -DCONFIG_PICO_DISPLAY_PACK=y
+
+Pico Display Pack2 
+west build -b rpi_pico -d build_lcd2 -- -DCONFIG_PICO_DISPLAY_PACK2=y
