@@ -11,7 +11,7 @@ on:
       version:
         description: "Release Version"
         required: true
-        default: "1"
+        default: "1.0"
         type: string
       text:
         description: "Release Text"
