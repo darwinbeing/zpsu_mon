@@ -8,6 +8,16 @@ on:
         required: true
         default: "v3.4.0"
         type: string
+      version:
+        description: "Release Version"
+        required: true
+        default: "1"
+        type: string
+      text:
+        description: "Release Text"
+        required: true
+        default: "This is my release text"
+        type: string
       prerelease:
         description: "Release as Prerelease"
         required: true
@@ -39,7 +49,7 @@ jobs:
       - name: Create Firmware Package
         run: |
           echo "Building Firmware"
-          echo "VERSION=1.0" >> $GITHUB_ENV
+          echo "VERSION=${{ inputs.version }}" >> $GITHUB_ENV
           brew install ninja ccache dtc
           pip install west
           west init --mr "${{ inputs.zephyr_tag }}" zephyrproject
@@ -69,7 +79,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: "${{ env.VERSION }}"
           release_name: "Release ${{ env.VERSION }}"
-          body: "This is my release text"
+          body: ${{ inputs.text }}
           file: build_lcd1/zephyr/zephyr.uf2
           asset_name: zephyr_pico_display_pack.uf2
           overwrite: true
@@ -79,7 +89,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           tag: "${{ env.VERSION }}"
           release_name: "Release ${{ env.VERSION }}"
-          body: "This is my release text"
+          body: ${{ inputs.text }}
           file: build_lcd2/zephyr/zephyr.uf2
           asset_name: zephyr_pico_display_pack2.uf2
           overwrite: true

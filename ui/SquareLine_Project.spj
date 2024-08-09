@@ -46,8 +46,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  64,
-                  -28
+                  58,
+                  -92
                 ],
                 "InheritedType": 7
               },
@@ -364,8 +364,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -64,
-                  -28
+                  -92,
+                  -92
                 ],
                 "InheritedType": 7
               },
@@ -683,8 +683,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  64,
-                  29
+                  58,
+                  -36
                 ],
                 "InheritedType": 7
               },
@@ -1001,8 +1001,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -64,
-                  29
+                  -92,
+                  -36
                 ],
                 "InheritedType": 7
               },
@@ -1319,8 +1319,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  109,
-                  -1
+                  128,
+                  -80
                 ],
                 "InheritedType": 7
               },
@@ -1637,8 +1637,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -20,
-                  -1
+                  -24,
+                  -80
                 ],
                 "InheritedType": 7
               },
@@ -1955,8 +1955,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  102,
-                  56
+                  135,
+                  -24
                 ],
                 "InheritedType": 7
               },
@@ -2280,8 +2280,8 @@
                 "flags": 17,
                 "strtype": "OBJECT/Position",
                 "intarray": [
-                  -20,
-                  56
+                  -21,
+                  -24
                 ],
                 "InheritedType": 7
               },
@@ -2845,7 +2845,7 @@
     "theme_color2": 0,
     "uiExportFolderPath": "/Users/litao/Developer/zpsu_mon/src/ui",
     "projectExportFolderPath": "/Users/litao/Developer/zpsu_mon/ui",
-    "backup_cnt": 9,
+    "backup_cnt": 10,
     "autosave_cnt": 0,
     "lvgl_version": "8.3.6",
     "callfuncsexport": "C_FILE",
