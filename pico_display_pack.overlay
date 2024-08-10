@@ -102,7 +102,7 @@
 		gctrl = <0x75>;
 		vrhs = <0x00>;
 		vdvs = <0x20>;
-		mdac = <0x60>;
+		mdac = <0x70>;
 		gamma = <0x03>;
 		colmod = <0x05>;
 		lcm = <0x2c>;

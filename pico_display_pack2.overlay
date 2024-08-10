@@ -102,7 +102,7 @@
 		gctrl = <0x35>;  /* VGH: 13.26V VGL: -10.43V */
 		vrhs = <0x12>;
 		vdvs = <0x20>;
-		mdac = <0x60>;  /* Rotate 270 */
+		mdac = <0x70>;  /* Rotate 270 */
 		gamma = <0x03>;
 		colmod = <0x05>; /* 16 bit/pixel */
 		lcm = <0x2c>;
