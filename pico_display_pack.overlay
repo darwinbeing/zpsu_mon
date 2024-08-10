@@ -98,19 +98,19 @@
 		height = <135>;
 		x-offset = <40>;
 		y-offset = <53>;
-		vcom = <0x19>;
-		gctrl = <0x35>;
-		vrhs = <0x12>;
+		vcom = <0x3D>;
+		gctrl = <0x75>;
+		vrhs = <0x00>;
 		vdvs = <0x20>;
-		mdac = <0x70>;
+		mdac = <0x60>;
 		gamma = <0x03>;
 		colmod = <0x05>;
 		lcm = <0x2c>;
 		porch-param = [0c 0c 00 33 33];
 		cmd2en-param = [5a 69 02 01];
 		pwctrl1-param = [a4 a1];
-		pvgam-param = [D0 04 0D 11 13 2B 3F 54 4C 18 0D 0B 1F 23];
-		nvgam-param = [D0 04 0C 11 13 2C 3F 44 51 2F 1F 1F 20 23];
+                pvgam-param = [70 04 08 09 09 05 2A 33 41 07 13 13 29 2f];
+                nvgam-param = [70 03 09 0A 09 06 2B 34 41 07 12 14 28 2E];
 		ram-param = [00 F0];
 		rgb-param = [CD 08 14];
 
