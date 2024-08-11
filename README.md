@@ -1,7 +1,11 @@
 # HP HSTNS-PL30 DIY Raspberry Pi Pico Watt Meter
 
-![alt text](images/PL30PicoWattMeter.png)
+[//]: # (Image References)
+[image1]: ./images/PL30PicoWattMeter.png "PICO Display Pack"
+[image2]: ./images/PL30PicoWattMeter2.png "PICO Display Pack2"  
 
+![alt text][image1]
+![alt text][image2]
 
 ### Build on Mac OS
 
