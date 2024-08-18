@@ -136,6 +136,7 @@ static void onButtonPressCb(buttonPressType_t type, buttonId_t id)
 
         // Always allow force restart
         if (type == BUTTONS_LONG_PRESS && id == BUTTON_TOP_LEFT) {
+                PSUCtrl_ONOFF();
         }
         // TODO Handle somewhere else, but for now turn on
         // display if it's off when a button is pressed.

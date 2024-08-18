@@ -195,6 +195,10 @@ int PSUCtrl_forceFanRPM(int rpm) {
         return 0;
 }
 
+int PSUCtrl_ONOFF() {
+        PSUCtrl_writeDPS1200(0x30,1);
+        return 0;
+}
 
 ZBUS_CHAN_DEFINE(psuctrl_data_chan,
                  struct psuctrl_data_event,
