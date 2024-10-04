@@ -17,8 +17,8 @@ brew install cmake dtc
 2. Install West  
 pip install west
 
-3. Initialize Zephyr(Tag: v3.4.0)  
-west init --mr v3.4.0 ~/zephyrproject  
+3. Initialize Zephyr(Tag: v3.7.0)  
+west init --mr v3.7.0 ~/zephyrproject  
 cd ~/zephyrproject  
 west update  
 pip install -r ~/zephyrproject/zephyr/scripts/requirements.txt  

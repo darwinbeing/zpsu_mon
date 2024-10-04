@@ -125,7 +125,8 @@ void watchface_app_stop(void)
 
 void general_work(struct k_work *item)
 {
-    delayed_work_item_t *the_work = CONTAINER_OF(item, delayed_work_item_t, work);
+    struct k_work_delayable *dwork = k_work_delayable_from_work(item);
+    delayed_work_item_t *the_work = CONTAINER_OF(dwork, delayed_work_item_t, work);
     switch (the_work->type) {
         case OPEN_WATCHFACE: {
             running = true;
