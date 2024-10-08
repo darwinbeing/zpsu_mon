@@ -3,6 +3,7 @@
 [//]: # (Image References)
 [image1]: ./images/PL30PicoWattMeter.png "PICO Display Pack"
 [image2]: ./images/PL30PicoWattMeter2.png "PICO Display Pack2"  
+[image3]: ./images/pico_w.png "PICOW WIFI"  
 
 ![alt text][image1]
 ![alt text][image2]
@@ -40,3 +41,9 @@ source ~/zephyrproject/zephyr/zephyr-env.sh
    
     Pico Display Pack2  
     west build -b rpi_pico -d build_lcd2 -- -DCONFIG_PICO_DISPLAY_PACK2=y
+
+### PICO W WIFI
+
+
+The WiFi functionality on the Pico W is up and running with Zephyr. The chip ID can be read, and the WiFi firmware downloads properly.
+![alt text][image3]
