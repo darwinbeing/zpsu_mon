@@ -45,5 +45,5 @@ source ~/zephyrproject/zephyr/zephyr-env.sh
 ### PICO W WIFI
 
 
-The WiFi functionality on the Pico W is up and running with Zephyr. The chip ID can be read, and the WiFi firmware downloads properly.
+The WiFi functionality on the Pico W is up and running with Zephyr. The chip ID can be read, and the WiFi firmware downloads properly. For faster transmission, the driver needs to support DMA.
 ![alt text][image3]
