@@ -4,7 +4,7 @@
 
 #include "psu_ctrl.h"
 #include <events/psuctrl_event.h>
-#include <zephyr/random/rand32.h>
+#include <zephyr/random/random.h>
 
 LOG_MODULE_REGISTER(PSUCtrl, LOG_LEVEL_WRN);
 

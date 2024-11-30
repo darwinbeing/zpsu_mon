@@ -6,7 +6,7 @@ on:
       zephyr_tag:
         description: "Zephyr Tag"
         required: true
-        default: "v3.7.0"
+        default: "v4.0.0"
         type: string
       version:
         description: "Release Version"
