@@ -27,6 +27,7 @@ void page_event_cb(lv_event_t *e)
 void watchface_show(void)
 {
 	ui_init();
+        PSUCtrl_UI_Init();
 }
 
 void watchface_remove(void)

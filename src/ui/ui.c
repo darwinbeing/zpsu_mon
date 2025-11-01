@@ -20,6 +20,8 @@ lv_obj_t *ui_Label6;
 lv_obj_t *ui_Label5;
 lv_obj_t *ui_Label8;
 lv_obj_t *ui_Label7;
+lv_obj_t *ui_LabelOnOff;
+lv_obj_t *ui_LabelCVCC;
 lv_obj_t *ui____initial_actions0;
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////

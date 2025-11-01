@@ -112,22 +112,22 @@ static void onButtonPressCb(buttonPressType_t type, buttonId_t id)
 
         switch(id) {
                 case BUTTON_TOP_RIGHT:
-                        last_brightness += 1;
-                        LOG_WRN("Display brightness up");
-                        display_control_set_brightness(last_brightness);
+                        // last_brightness += 1;
+                        // LOG_WRN("Display brightness up");
+                        // display_control_set_brightness(last_brightness);
                         break;
                 case BUTTON_BOTTOM_RIGHT:
-                        last_brightness -= 1;
-                        LOG_WRN("Display brightness down");
-                        display_control_set_brightness(last_brightness);
+                        // last_brightness -= 1;
+                        // LOG_WRN("Display brightness down");
+                        // display_control_set_brightness(last_brightness);
                         break;
                 case BUTTON_TOP_LEFT:
-                          fanRPM += 1000;
-                          PSUCtrl_forceFanRPM(fanRPM);
+                        // fanRPM += 1000;
+                        // PSUCtrl_forceFanRPM(fanRPM);
                         break;
                 case BUTTON_BOTTOM_LEFT:
-                          fanRPM -= 1000;
-                          PSUCtrl_forceFanRPM(fanRPM);
+                        // fanRPM -= 1000;
+                        // PSUCtrl_forceFanRPM(fanRPM);
                         break;
                 default:
                         LOG_WRN("Unhandled button %d, type: %d", id, type);
@@ -138,6 +138,11 @@ static void onButtonPressCb(buttonPressType_t type, buttonId_t id)
         if (type == BUTTONS_LONG_PRESS && id == BUTTON_TOP_LEFT) {
                 PSUCtrl_ONOFF();
         }
+
+        if (type == BUTTONS_LONG_PRESS && id == BUTTON_TOP_RIGHT) {
+                PSUCtrl_CVCC();
+        }
+
         // TODO Handle somewhere else, but for now turn on
         // display if it's off when a button is pressed.
         display_control_power_on(true);

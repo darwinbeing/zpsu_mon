@@ -26,6 +26,8 @@ extern lv_obj_t *ui_Label6;
 extern lv_obj_t *ui_Label5;
 extern lv_obj_t *ui_Label8;
 extern lv_obj_t *ui_Label7;
+extern lv_obj_t *ui_LabelOnOff;
+extern lv_obj_t *ui_LabelCVCC;
 extern lv_obj_t *ui____initial_actions0;
 
 

@@ -5,6 +5,7 @@
 #include "psu_ctrl.h"
 #include <events/psuctrl_event.h>
 #include <zephyr/random/random.h>
+#include "ui.h"
 
 LOG_MODULE_REGISTER(PSUCtrl, LOG_LEVEL_WRN);
 
@@ -195,8 +196,73 @@ int PSUCtrl_forceFanRPM(int rpm) {
         return 0;
 }
 
+// 0 - OFF 1 - ON
 int PSUCtrl_ONOFF() {
-        PSUCtrl_writeDPS1200(0x30,1);
+        int val;
+        int ret;
+
+        ret = PSUCtrl_readDPS1200Register(0x21, &val);
+        if(ret) {
+                return ret;
+        }
+        val ^= 1 << 15;
+        PSUCtrl_writeDPS1200(0x42, val);
+        ret = PSUCtrl_readDPS1200Register(0x21, &val);
+        if(!ret) {
+                if( val & (1 << 15)) {
+                        lv_label_set_text(ui_LabelOnOff, "ON");
+                        printf("===ON===\n");
+                } else {
+                        lv_label_set_text(ui_LabelOnOff, "OFF");
+                        printf("===OFF===\n");
+                }
+        }
+        return 0;
+}
+
+// 0 - CV 1 - CC
+int PSUCtrl_CVCC() {
+        int val;
+        int ret;
+
+        ret = PSUCtrl_readDPS1200Register(0x21, &val);
+        if(ret) {
+                return ret;
+        }
+        val ^= 1;
+        PSUCtrl_writeDPS1200(0x42, val);
+        ret = PSUCtrl_readDPS1200Register(0x21, &val);
+        if(!ret) {
+                if(val & 0x1) {
+                        lv_label_set_text(ui_LabelCVCC, "CC");
+                        printf("===CC===\n");
+                } else {
+                        lv_label_set_text(ui_LabelCVCC, "CV");
+                        printf("===CV===\n");
+                }
+        }
+
+        return 0;
+}
+
+int PSUCtrl_UI_Init()
+{
+        int val;
+        int ret;
+
+        ret = PSUCtrl_readDPS1200Register(0x21, &val);
+        if(!ret) {
+                if( val & (1 << 15)) {
+                        lv_label_set_text(ui_LabelOnOff, "ON");
+                } else {
+                        lv_label_set_text(ui_LabelOnOff, "OFF");
+                }
+                if(val & 0x1) {
+                        lv_label_set_text(ui_LabelCVCC, "CC");
+                } else {
+                        lv_label_set_text(ui_LabelCVCC, "CV");
+                }
+        }
         return 0;
 }
 
@@ -231,6 +297,7 @@ static void send_psuctrl_data_event(void)
                 volts = val;
                 volts = volts/256;
         }
+
         ret=PSUCtrl_readDPS1200Register(8, &val);
         if(!ret) {
                 amps = val;

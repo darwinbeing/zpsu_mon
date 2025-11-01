@@ -142,4 +142,42 @@ lv_obj_set_style_text_color(ui_Label7, lv_color_hex(0x00FF00), LV_PART_MAIN | LV
 lv_obj_set_style_text_opa(ui_Label7, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_Label7, &lv_font_montserrat_16, LV_PART_MAIN| LV_STATE_DEFAULT);
 
+ui_LabelOnOff = lv_label_create(ui_Screen1);
+lv_obj_set_width( ui_LabelOnOff, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_LabelOnOff, LV_SIZE_CONTENT);   /// 1
+#if defined(CONFIG_PICO_DISPLAY_PACK)
+    lv_obj_set_x( ui_LabelOnOff, 96 );
+    lv_obj_set_y( ui_LabelOnOff, -56 );
+#elif defined(CONFIG_PICO_DISPLAY_PACK2)
+    lv_obj_set_x( ui_LabelOnOff, 128 );
+    lv_obj_set_y( ui_LabelOnOff, -110 );
+#endif
+lv_obj_set_x( ui_LabelOnOff, 96 );
+lv_obj_set_y( ui_LabelOnOff, -56 );
+lv_obj_set_align( ui_LabelOnOff, LV_ALIGN_CENTER );
+lv_label_set_text(ui_LabelOnOff,"OFF");
+lv_obj_set_style_text_color(ui_LabelOnOff, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_text_opa(ui_LabelOnOff, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelOnOff, &lv_font_montserrat_8, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_LabelOnOff, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_LabelOnOff, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+
+ui_LabelCVCC = lv_label_create(ui_Screen1);
+lv_obj_set_width( ui_LabelCVCC, LV_SIZE_CONTENT);  /// 1
+lv_obj_set_height( ui_LabelCVCC, LV_SIZE_CONTENT);   /// 1
+#if defined(CONFIG_PICO_DISPLAY_PACK)
+    lv_obj_set_x( ui_LabelCVCC, 112 );
+    lv_obj_set_y( ui_LabelCVCC, -56 );
+#elif defined(CONFIG_PICO_DISPLAY_PACK2)
+    lv_obj_set_x( ui_LabelCVCC, 148 );
+    lv_obj_set_y( ui_LabelCVCC, -110 );
+#endif
+lv_obj_set_align( ui_LabelCVCC, LV_ALIGN_CENTER );
+lv_label_set_text(ui_LabelCVCC,"CV");
+lv_obj_set_style_text_color(ui_LabelCVCC, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_text_opa(ui_LabelCVCC, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_text_font(ui_LabelCVCC, &lv_font_montserrat_8, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_set_style_bg_color(ui_LabelCVCC, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
+lv_obj_set_style_bg_opa(ui_LabelCVCC, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+
 }
