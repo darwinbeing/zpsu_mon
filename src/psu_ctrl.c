@@ -281,6 +281,7 @@ ZBUS_CHAN_DECLARE(psuctrl_data_chan);
 static void psuctrl_work_cb(struct k_work *work);
 static K_WORK_DELAYABLE_DEFINE(psuctrl_work, psuctrl_work_cb);
 
+static float Gain=1/0.856;
 static float volts = 0;
 static float amps = 0;
 static float watts = 0;
@@ -295,9 +296,8 @@ static void send_psuctrl_data_event(void)
         ret=PSUCtrl_readDPS1200Register(7, &val);
         if(!ret) {
                 volts = val;
-                volts = volts/256;
+                volts = volts*Gain/256;
         }
-
         ret=PSUCtrl_readDPS1200Register(8, &val);
         if(!ret) {
                 amps = val;
