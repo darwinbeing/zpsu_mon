@@ -152,8 +152,6 @@ lv_obj_set_height( ui_LabelOnOff, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_x( ui_LabelOnOff, 128 );
     lv_obj_set_y( ui_LabelOnOff, -110 );
 #endif
-lv_obj_set_x( ui_LabelOnOff, 96 );
-lv_obj_set_y( ui_LabelOnOff, -56 );
 lv_obj_set_align( ui_LabelOnOff, LV_ALIGN_CENTER );
 lv_label_set_text(ui_LabelOnOff,"OFF");
 lv_obj_set_style_text_color(ui_LabelOnOff, lv_color_hex(0xFF0000), LV_PART_MAIN | LV_STATE_DEFAULT );
