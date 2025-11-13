@@ -6,19 +6,16 @@ if(CONFIG_PICO_DISPLAY_PACK)
   set(DTC_OVERLAY_FILE "pico_display_pack.overlay")
 elseif(CONFIG_PICO_DISPLAY_PACK2)
   set(DTC_OVERLAY_FILE "pico_display_pack2.overlay")
+elseif(CONFIG_PICO2_DISPLAY_PACK)
+  set(DTC_OVERLAY_FILE "pico2_display_pack.overlay")
+elseif(CONFIG_PICO2_DISPLAY_PACK2)
+  set(DTC_OVERLAY_FILE "pico2_display_pack2.overlay")
 endif()
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(zpsu-mon)
 
 add_compile_definitions(LV_LVGL_H_INCLUDE_SIMPLE)
-
-if(CONFIG_POSIX_API OR CONFIG_PTHREAD_IPC OR CONFIG_POSIX_CLOCK OR
-  CONFIG_POSIX_MQUEUE OR CONFIG_POSIX_FS OR CONFIG_EVENTFD OR CONFIG_GETOPT)
-  # This is a temporary workaround so that Newlib declares the appropriate
-  # types for us. POSIX features to be formalized as part of #51211
-  zephyr_compile_options($<$<COMPILE_LANGUAGE:C>:-DPATH_MAX=256>)
-endif()
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/src

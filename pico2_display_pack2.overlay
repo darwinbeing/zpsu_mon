@@ -3,12 +3,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <zephyr/dt-bindings/pinctrl/rpi-pico-rp2040-pinctrl.h>
+#include <zephyr/dt-bindings/pinctrl/rpi-pico-rp2350a-pinctrl.h>
 #include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
 / {
     chosen {
-	   zephyr,console = &usb_cdc;
-	   zephyr,shell-uart = &usb_cdc;
 	   zephyr,display = &st7789v;
 	};
 
@@ -121,10 +119,8 @@
 	};
 };
 
-&zephyr_udc0 {
-	usb_cdc: usb_cdc_0 {
-		compatible = "zephyr,cdc-acm-uart";
-	};
+&spi0 {
+	status = "okay";
 };
 
 &pwm_led0 {
