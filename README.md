@@ -36,14 +36,15 @@ git clone https://github.com/darwinbeing/zpsu_mon.git ~/
 cd ~/zpsu_mon  
 source ~/zephyrproject/zephyr/zephyr-env.sh
 
-    Pico Display Pack  
+    Pico RP2040 Display Pack  
     west build -b rpi_pico -d build_lcd1 -- -DCONFIG_PICO_DISPLAY_PACK=y
    
-    Pico Display Pack2  
+    Pico RP2040 Display Pack2  
     west build -b rpi_pico -d build_lcd2 -- -DCONFIG_PICO_DISPLAY_PACK2=y
 
-### PICO W WIFI
+    Pico2 RP2350A Display Pack  
+    west build -b rpi_pico2/rp2350a/m33 -d build_lcd1 -- -DCONFIG_PICO2_DISPLAY_PACK=y
 
+    Pico2 RP2350A Display Pack2  
+    west build -b rpi_pico2/rp2350a/m33 -d build_lcd1 -- -DCONFIG_PICO2_DISPLAY_PACK2=y    
 
-The WiFi functionality on the Pico W is up and running with Zephyr. The chip ID can be read, and the WiFi firmware downloads properly. For faster transmission, the driver needs to support DMA.
-![alt text][image3]
