@@ -105,7 +105,7 @@
                 nvgam-param = [70 03 09 0A 09 06 2B 34 41 07 12 14 28 2E];
 		ram-param = [00 F0];
 		rgb-param = [CD 08 14];
-                mipi-mode = <MIPI_DBI_MODE_SPI_4WIRE>;
+                mipi-mode = "MIPI_DBI_MODE_SPI_4WIRE";
 	};
      };
 };
