@@ -6,7 +6,7 @@ on:
       zephyr_tag:
         description: "Zephyr Tag"
         required: true
-        default: "v4.0.0"
+        default: "v4.2.1"
         type: string
       version:
         description: "Release Version"
@@ -65,8 +65,8 @@ jobs:
           source zephyrproject/zephyr/zephyr-env.sh
           west build -b rpi_pico -d build_lcd1 -- -DCONFIG_PICO_DISPLAY_PACK=y
           west build -b rpi_pico -d build_lcd2 -- -DCONFIG_PICO_DISPLAY_PACK2=y
-          west build -b rpi_pico2/rp2350a/m33 -d build_lcd3 -- -DCONFIG_PICO2_DISPLAY_PACK=y
-          west build -b rpi_pico2/rp2350a/m33 -d build_lcd4 -- -DCONFIG_PICO2_DISPLAY_PACK2=y
+          west build -b rpi_pico2/rp2350a/m33 -d build_lcd3 -- -DCONFIG_PICO_DISPLAY_PACK=y
+          west build -b rpi_pico2/rp2350a/m33 -d build_lcd4 -- -DCONFIG_PICO_DISPLAY_PACK2=y
       - name: Delete existing release and tag
         id: delete-tag-release
         uses: dev-drprasad/delete-tag-and-release@v1.1

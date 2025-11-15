@@ -43,8 +43,8 @@ source ~/zephyrproject/zephyr/zephyr-env.sh
     west build -b rpi_pico -d build_lcd2 -- -DCONFIG_PICO_DISPLAY_PACK2=y
 
     Pico2 RP2350A Display Pack  
-    west build -b rpi_pico2/rp2350a/m33 -d build_lcd1 -- -DCONFIG_PICO2_DISPLAY_PACK=y
+    west build -b rpi_pico2/rp2350a/m33 -d build_lcd3 -- -DCONFIG_PICO_DISPLAY_PACK=y
 
     Pico2 RP2350A Display Pack2  
-    west build -b rpi_pico2/rp2350a/m33 -d build_lcd1 -- -DCONFIG_PICO2_DISPLAY_PACK2=y    
+    west build -b rpi_pico2/rp2350a/m33 -d build_lcd4 -- -DCONFIG_PICO_DISPLAY_PACK2=y    
 
