@@ -14,12 +14,9 @@
 #include <math.h>
 
 #include "ui.h"
-#include "button_handler.h"
-#include "button_assignments.h"
 #include <display_control.h>
 #include "watchface_app.h"
 #include "psu_ctrl.h"
-#include <buttons.h>
 #include "psu_ctrl.h"
 
 // #define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
@@ -47,7 +44,6 @@ static const struct pwm_dt_spec blue_pwm_led = PWM_DT_SPEC_GET(DT_ALIAS(blue_pwm
 static uint32_t fanRPM = 3200;
 static uint8_t last_brightness = 5;
 
-static void onButtonPressCb(buttonPressType_t type, buttonId_t id);
 static ui_state_t watch_state = INIT_STATE;
 
 K_WORK_DEFINE(init_work, run_init_work);
@@ -62,7 +58,6 @@ void run_init_work(struct k_work *item)
 {
         pwm_rgb_led_init();
         psuctrl_init();
-        // buttonsInit(&onButtonPressCb);
         // Not to self, PWM consumes like 250uA...
         // Need to disable also when screen is off.
         display_control_init();
@@ -113,72 +108,6 @@ static int pwm_rgb_led_init(void)
                 return 0;
         }
 	return 0;
-}
-
-static void onButtonPressCb(buttonPressType_t type, buttonId_t id)
-{
-        LOG_WRN("Pressed %d, type: %d", id, type);
-
-        switch(id) {
-                case BUTTON_TOP_RIGHT:
-                        // last_brightness += 1;
-                        // LOG_WRN("Display brightness up");
-                        // display_control_set_brightness(last_brightness);
-                        break;
-                case BUTTON_BOTTOM_RIGHT:
-                        // last_brightness -= 1;
-                        // LOG_WRN("Display brightness down");
-                        // display_control_set_brightness(last_brightness);
-                        break;
-                case BUTTON_TOP_LEFT:
-                        // fanRPM += 1000;
-                        // PSUCtrl_forceFanRPM(fanRPM);
-                        break;
-                case BUTTON_BOTTOM_LEFT:
-                        // fanRPM -= 1000;
-                        // PSUCtrl_forceFanRPM(fanRPM);
-                        break;
-                default:
-                        LOG_WRN("Unhandled button %d, type: %d", id, type);
-                        break;
-        }
-
-        // Always allow force restart
-        if (type == BUTTONS_LONG_PRESS && id == BUTTON_TOP_LEFT) {
-                // PSUCtrl_ONOFF();
-        }
-
-        if (type == BUTTONS_LONG_PRESS && id == BUTTON_TOP_RIGHT) {
-                // PSUCtrl_CVCC();
-        }
-
-        // TODO Handle somewhere else, but for now turn on
-        // display if it's off when a button is pressed.
-        display_control_power_on(true);
-
-        if (id == BUTTON_BOTTOM_RIGHT && watch_state == APPLICATION_MANAGER_STATE) {
-                // TODO doesn't work, as this press is read later with lvgl and causes extra press in settings.
-                // To fix each application must have exit button, maybe we can register long press on the whole view to exit
-                // apps without input device
-                // application_manager_exit_app();
-                return;
-        }
-
-        if (type == BUTTONS_SHORT_PRESS && watch_state == WATCHFACE_STATE) {
-                // play_press_vibration();
-                if (id == BUTTON_TOP_LEFT) {
-                        LOG_DBG("Close Watchface, open App Manager");
-                } else if (id == BUTTON_BOTTOM_RIGHT) {
-                        LOG_DBG("CloseWatchface, open Notifications page");
-                } else {
-                        LOG_WRN("Unhandled button %d, type: %d, watch_state: %d", id, type, watch_state);
-                }
-        } else {
-                if (id == BUTTON_TOP_LEFT) {
-                } else {
-                        LOG_WRN("Unhandled button %d, type: %d, watch_state: %d", id, type, watch_state);
-                }
-        }
 }
 
 int main(void)

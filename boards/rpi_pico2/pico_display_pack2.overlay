@@ -22,14 +22,6 @@
 
     aliases {
         display-blk = &display_blk;
-        sw0 = &button0;
-        sw1 = &button1;
-        sw2 = &button2;
-        sw3 = &button3;
-        sw-top-right = &button2;
-        sw-top-left = &button0;
-        sw-bottom-right = &button3;
-        sw-bottom-left = &button1;
         pwm-led1 = &pwm_led1;
 	red-pwm-led = &red_pwm_led;
 	green-pwm-led = &green_pwm_led;

@@ -38,8 +38,6 @@ set(app_SRCS
   ${PROJECT_SOURCE_DIR}/src/ui/fonts/ui_font_DSEG7ClassicBold36.c
   ${PROJECT_SOURCE_DIR}/src/watchface_app.c
   ${PROJECT_SOURCE_DIR}/src/psu_ctrl.c
-  ${PROJECT_SOURCE_DIR}/src/buttons.c
-  ${PROJECT_SOURCE_DIR}/src/button_handler.c
   ${PROJECT_SOURCE_DIR}/src/clock.c
   ${PROJECT_SOURCE_DIR}/src/notification_manager.c
   ${PROJECT_SOURCE_DIR}/src/main.c
