@@ -75,7 +75,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           delete_release: true
         continue-on-error: true
-      - name: Upload Release
+      - name: Upload Release Zpsu PICO(RP2040) PICO Display Pack FW
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -83,9 +83,9 @@ jobs:
           release_name: "Release ${{ env.VERSION }}"
           body: ${{ inputs.text }}
           file: build_lcd1/zephyr/zephyr.uf2
-          asset_name: zephyr_pico_display_pack.uf2
+          asset_name: zpsu_pico_pdp1.uf2
           overwrite: true
-      - name: Upload Release
+      - name: Upload Release Zpsu PICO(RP2040) PICO Display Pack2 FW
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -93,9 +93,9 @@ jobs:
           release_name: "Release ${{ env.VERSION }}"
           body: ${{ inputs.text }}
           file: build_lcd2/zephyr/zephyr.uf2
-          asset_name: zephyr_pico_display_pack2.uf2
+          asset_name: zpsu_pico_pdp2.uf2
           overwrite: true
-      - name: Upload Release
+      - name: Upload Release Zpsu PICO2(RP2350) PICO Display Pack FW
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -103,9 +103,9 @@ jobs:
           release_name: "Release ${{ env.VERSION }}"
           body: ${{ inputs.text }}
           file: build_lcd3/zephyr/zephyr.uf2
-          asset_name: zephyr_pico2_display_pack.uf2
+          asset_name: zpsu_pico2_pdp1.uf2
           overwrite: true
-      - name: Upload Release
+      - name: Upload Release Zpsu PICO2(RP2350) PICO Display Pack2 FW
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -113,5 +113,5 @@ jobs:
           release_name: "Release ${{ env.VERSION }}"
           body: ${{ inputs.text }}
           file: build_lcd4/zephyr/zephyr.uf2
-          asset_name: zephyr_pico2_display_pack2.uf2
+          asset_name: zpsu_pico2_pdp2.uf2
           overwrite: true
