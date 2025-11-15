@@ -196,53 +196,58 @@ int PSUCtrl_forceFanRPM(int rpm) {
         return 0;
 }
 
-// 0 - OFF 1 - ON
-int PSUCtrl_ONOFF() {
+
+void PSUCtrl_ONOFF(lv_event_t * e) {
+        lv_obj_t * obj = lv_event_get_target(e);
+        lv_event_code_t code = lv_event_get_code(e);
         int val;
         int ret;
 
-        ret = PSUCtrl_readDPS1200Register(0x21, &val);
-        if(ret) {
-                return ret;
-        }
-        val ^= 1 << 15;
-        PSUCtrl_writeDPS1200(0x42, val);
-        ret = PSUCtrl_readDPS1200Register(0x21, &val);
-        if(!ret) {
-                if( val & (1 << 15)) {
-                        lv_label_set_text(ui_LabelOnOff, "ON");
-                        printf("===ON===\n");
-                } else {
-                        lv_label_set_text(ui_LabelOnOff, "OFF");
-                        printf("===OFF===\n");
+        if(code == LV_EVENT_CLICKED) {
+                ret = PSUCtrl_readDPS1200Register(0x21, &val);
+                if(ret) {
+                        return ;
+                }
+                val ^= 1 << 15;
+                PSUCtrl_writeDPS1200(0x42, val);
+                ret = PSUCtrl_readDPS1200Register(0x21, &val);
+                if(!ret) {
+                        if( val & (1 << 15)) {
+                                lv_label_set_text(ui_LabelOnOff, "ON");
+                                printf("===ON===\n");
+                        } else {
+                                lv_label_set_text(ui_LabelOnOff, "OFF");
+                                printf("===OFF===\n");
+                        }
                 }
         }
-        return 0;
 }
 
 // 0 - CV 1 - CC
-int PSUCtrl_CVCC() {
+void PSUCtrl_CVCC(lv_event_t * e) {
+        lv_obj_t * obj = lv_event_get_target(e);
+        lv_event_code_t code = lv_event_get_code(e);
         int val;
         int ret;
 
-        ret = PSUCtrl_readDPS1200Register(0x21, &val);
-        if(ret) {
-                return ret;
-        }
-        val ^= 1;
-        PSUCtrl_writeDPS1200(0x42, val);
-        ret = PSUCtrl_readDPS1200Register(0x21, &val);
-        if(!ret) {
-                if(val & 0x1) {
-                        lv_label_set_text(ui_LabelCVCC, "CC");
-                        printf("===CC===\n");
-                } else {
-                        lv_label_set_text(ui_LabelCVCC, "CV");
-                        printf("===CV===\n");
+        if(code == LV_EVENT_CLICKED) {
+                ret = PSUCtrl_readDPS1200Register(0x21, &val);
+                if(ret) {
+                        return ;
+                }
+                val ^= 1;
+                PSUCtrl_writeDPS1200(0x42, val);
+                ret = PSUCtrl_readDPS1200Register(0x21, &val);
+                if(!ret) {
+                        if(val & 0x1) {
+                                lv_label_set_text(ui_LabelCVCC, "CC");
+                                printf("===CC===\n");
+                        } else {
+                                lv_label_set_text(ui_LabelCVCC, "CV");
+                                printf("===CV===\n");
+                        }
                 }
         }
-
-        return 0;
 }
 
 int PSUCtrl_UI_Init()

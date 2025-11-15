@@ -62,11 +62,20 @@ void run_init_work(struct k_work *item)
 {
         pwm_rgb_led_init();
         psuctrl_init();
-        buttonsInit(&onButtonPressCb);
+        // buttonsInit(&onButtonPressCb);
         // Not to self, PWM consumes like 250uA...
         // Need to disable also when screen is off.
         display_control_init();
         display_control_power_on(true);
+
+	static const struct device *lvgl_btn_dev;
+	lvgl_btn_dev = DEVICE_DT_GET(DT_COMPAT_GET_ANY_STATUS_OKAY(zephyr_lvgl_button_input));
+	if (!device_is_ready(lvgl_btn_dev))
+	{
+		LOG_ERR("Device not ready, aborting...");
+		return 0;
+	}
+
         watch_state = WATCHFACE_STATE;
         watchface_app_start(NULL);
         // k_thread_start(psuCtrlThreadId);
@@ -136,11 +145,11 @@ static void onButtonPressCb(buttonPressType_t type, buttonId_t id)
 
         // Always allow force restart
         if (type == BUTTONS_LONG_PRESS && id == BUTTON_TOP_LEFT) {
-                PSUCtrl_ONOFF();
+                // PSUCtrl_ONOFF();
         }
 
         if (type == BUTTONS_LONG_PRESS && id == BUTTON_TOP_RIGHT) {
-                PSUCtrl_CVCC();
+                // PSUCtrl_CVCC();
         }
 
         // TODO Handle somewhere else, but for now turn on

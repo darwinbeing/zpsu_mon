@@ -5,29 +5,43 @@
  */
 #include <zephyr/dt-bindings/pinctrl/rpi-pico-rp2350a-pinctrl.h>
 #include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
 / {
     chosen {
+	   zephyr,console = &usb_cdc;
+	   zephyr,shell-uart = &usb_cdc;
 	   zephyr,display = &st7789v;
 	};
 
-    buttons {
+    keys: keys {
         compatible = "gpio-keys";
         button0: button_A {
             gpios = <&gpio0 12 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
             label = "Push button A";
+	    zephyr,code = <INPUT_KEY_1>;
         };
         button1: button_B {
             gpios = <&gpio0 13 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
             label = "Push button B";
+	    zephyr,code = <INPUT_KEY_2>;
         };
         button2: button_X {
             gpios = <&gpio0 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
             label = "Push button X";
+	    zephyr,code = <INPUT_KEY_3>;
         };
         button3: button_Y {
             gpios = <&gpio0 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
             label = "Push button Y";
+	    zephyr,code = <INPUT_KEY_4>;
         };
+    };
+
+    lvgl_button_input: lvgl_button_input {
+	compatible = "zephyr,lvgl-button-input";
+	input = <&keys>;
+	input-codes = <INPUT_KEY_1 INPUT_KEY_2 INPUT_KEY_3 INPUT_KEY_4>;
+	coordinates = <288 9>, <10 10>, <307 9>, <10 10>;
     };
 
     pwm_leds {
@@ -116,6 +130,12 @@
 			slew-rate = <1>;
 			bias-pull-up;
 		};
+	};
+};
+
+&zephyr_udc0 {
+	usb_cdc: usb_cdc_0 {
+		compatible = "zephyr,cdc-acm-uart";
 	};
 };
 

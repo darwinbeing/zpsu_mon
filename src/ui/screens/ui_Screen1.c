@@ -5,6 +5,9 @@
 
 #include "../ui.h"
 
+void PSUCtrl_ONOFF(lv_event_t * e);
+void PSUCtrl_CVCC(lv_event_t * e);
+
 void ui_Screen1_screen_init(void)
 {
 ui_Screen1 = lv_obj_create(NULL);
@@ -159,6 +162,9 @@ lv_obj_set_style_text_opa(ui_LabelOnOff, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_LabelOnOff, &lv_font_montserrat_8, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_bg_color(ui_LabelOnOff, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_LabelOnOff, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_add_flag(ui_LabelOnOff, LV_OBJ_FLAG_CLICKABLE);
+
+lv_obj_add_event_cb(ui_LabelOnOff, PSUCtrl_ONOFF, LV_EVENT_CLICKED, NULL);
 
 ui_LabelCVCC = lv_label_create(ui_Screen1);
 lv_obj_set_width( ui_LabelCVCC, LV_SIZE_CONTENT);  /// 1
@@ -177,5 +183,8 @@ lv_obj_set_style_text_opa(ui_LabelCVCC, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_text_font(ui_LabelCVCC, &lv_font_montserrat_8, LV_PART_MAIN| LV_STATE_DEFAULT);
 lv_obj_set_style_bg_color(ui_LabelCVCC, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT );
 lv_obj_set_style_bg_opa(ui_LabelCVCC, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
+lv_obj_add_flag(ui_LabelCVCC, LV_OBJ_FLAG_CLICKABLE);
+
+lv_obj_add_event_cb(ui_LabelCVCC, PSUCtrl_CVCC, LV_EVENT_CLICKED, NULL);
 
 }
