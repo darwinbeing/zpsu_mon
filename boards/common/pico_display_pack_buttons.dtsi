@@ -1,0 +1,29 @@
+/ {
+    keys: keys {
+        compatible = "gpio-keys";
+
+        button0: button_A {
+            gpios = <&gpio0 12 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button A";
+            zephyr,code = <INPUT_KEY_1>;
+        };
+
+        button1: button_B {
+            gpios = <&gpio0 13 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button B";
+            zephyr,code = <INPUT_KEY_2>;
+        };
+
+        button2: button_X {
+            gpios = <&gpio0 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button X";
+            zephyr,code = <INPUT_KEY_3>;
+        };
+
+        button3: button_Y {
+            gpios = <&gpio0 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>;
+            label = "Push button Y";
+            zephyr,code = <INPUT_KEY_4>;
+        };
+    };
+};

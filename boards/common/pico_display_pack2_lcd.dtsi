@@ -1,0 +1,40 @@
+/ {
+    mipi_dbi {
+        compatible = "zephyr,mipi-dbi-spi";
+	status = "okay";
+	dc-gpios = <&gpio0 16 GPIO_ACTIVE_HIGH>;	/* DET */
+	/* reset-gpios = <&gpio0 25 GPIO_ACTIVE_LOW>; */	/* RESX reset */
+
+        spi-dev = <&spi0>;
+	write-only;
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+	/* Pico Display Pack2 */
+	st7789v: st7789v@0 {
+		compatible = "sitronix,st7789v";
+		reg = <0>;
+		mipi-max-frequency = <DT_FREQ_M(48)>;
+		width = <320>;
+		height = <240>;
+		x-offset = <0>;
+		y-offset = <0>;
+		vcom = <0x1f>;   /* VCOMS Setting: 0.875V */
+		gctrl = <0x35>;  /* VGH: 13.26V VGL: -10.43V */
+		vrhs = <0x12>;
+		vdvs = <0x20>;
+		mdac = <0x70>;  /* Rotate 270 */
+		gamma = <0x03>;
+		colmod = <0x05>; /* 16 bit/pixel */
+		lcm = <0x2c>;
+		porch-param = [0c 0c 00 33 33];
+		cmd2en-param = [5a 69 02 01];
+		pwctrl1-param = [a4 a1];
+		pvgam-param = [D0 08 11 08 0C 15 39 33 50 36 13 14 29 2D];
+		nvgam-param = [D0 08 10 08 06 06 39 44 51 0B 16 14 2F 31];
+		ram-param = [00 F0];
+		rgb-param = [CD 08 14];
+                mipi-mode = "MIPI_DBI_MODE_SPI_4WIRE";
+	};
+     };
+};

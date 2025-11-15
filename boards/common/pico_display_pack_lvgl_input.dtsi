@@ -1,0 +1,15 @@
+/ {
+    lvgl_button_input: lvgl_button_input {
+        compatible = "zephyr,lvgl-button-input";
+
+        input = <&keys>;
+
+        input-codes = <
+            INPUT_KEY_1
+            INPUT_KEY_2
+            INPUT_KEY_3
+            INPUT_KEY_4
+        >;
+
+    };
+};

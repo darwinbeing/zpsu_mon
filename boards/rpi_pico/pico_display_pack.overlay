@@ -1,0 +1,60 @@
+/*
+ * Copyright (c) 2019 Creative Product Design
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+#include <zephyr/dt-bindings/pinctrl/rpi-pico-rp2040-pinctrl.h>
+#include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+#include "../common/pico_display_pack_lcd.dtsi"
+#include "../common/pico_display_pack_buttons.dtsi"
+#include "../common/pico_display_pack_lvgl_input.dtsi"
+#include "../common/pico_display_pack_leds.dtsi"
+#include "../common/pico_display_pack_pwm_config.dtsi"
+
+/ {
+    chosen {
+           zephyr,console = &usb_cdc;
+	   zephyr,shell-uart = &usb_cdc;
+	   zephyr,display = &st7789v;
+	};
+
+    aliases {
+        display-blk = &display_blk;
+        sw0 = &button0;
+        sw1 = &button1;
+        sw2 = &button2;
+        sw3 = &button3;
+        sw-top-right = &button2;
+        sw-top-left = &button0;
+        sw-bottom-right = &button3;
+        sw-bottom-left = &button1;
+        pwm-led1 = &pwm_led1;
+	red-pwm-led = &red_pwm_led;
+	green-pwm-led = &green_pwm_led;
+	blue-pwm-led = &blue_pwm_led;
+    };
+
+};
+
+&lvgl_button_input {
+    coordinates = <216 10>, <10 10>, <231 10>, <10 10>;
+};
+
+&zephyr_udc0 {
+	usb_cdc: usb_cdc_0 {
+		compatible = "zephyr,cdc-acm-uart";
+	};
+};
+
+&spi0 {
+	status = "okay";
+};
+
+&pwm_led0 {
+	status = "okay";
+};
+
+&pwm_led1 {
+	status = "okay";
+};
